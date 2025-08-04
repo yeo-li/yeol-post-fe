@@ -1,0 +1,22 @@
+# node_modules
+node_modules/
+
+.vercel
+
+# 환경 설정 파일
+.env
+.env.local
+.env.*.local
+
+# OS 메타데이터
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# 로그
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
