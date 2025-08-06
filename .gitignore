@@ -18,3 +18,4 @@ yeol-post-fe.git.bfg-report/
 # 7) 환경파일
 .env
 .env.*.localyeol-post-fe.git/
+.env.*

@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Lock, X, Loader2 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import Image from "next/image"
-import {API_URL} from "@/src/config";
 
 interface LoginModalProps {
   isOpen: boolean
@@ -24,7 +23,7 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
     localStorage.setItem("redirectAfterLogin", window.location.href)
 
     // OAuth2 카카오 인증 엔드포인트로 리다이렉트
-    window.location.href = `${API_URL}/oauth2/authorization/kakao`
+    window.location.href = `${process.env.NEXT_PUBLIC_URL}/oauth2/authorization/kakao`
   }
 
   const handleClose = () => {

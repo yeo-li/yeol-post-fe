@@ -7,7 +7,6 @@ import { ArrowLeft, BookOpen, Calendar, Clock } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
-import {API_URL} from "@/src/config";
 
 // Summary 처리 함수
 function getDisplaySummary(excerpt: string, content: string, maxLength = 120): string {
@@ -74,7 +73,7 @@ export default function DynamicCategoryPage() {
             setLoading(true)
             try {
                 // 카테고리별 게시물 불러오기
-                const postsResponse = await fetch(`${API_URL}/api/v1/posts?category=${categoryName}`, {
+                const postsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts?category=${categoryName}`, {
                     method: "GET",
                     credentials: "include",
                 })
@@ -82,7 +81,7 @@ export default function DynamicCategoryPage() {
                 setPosts(postsJson.result || [])
 
                 // 모든 카테고리 불러오기
-                const categoriesResponse = await fetch(`${API_URL}/api/v1/categories`, {
+                const categoriesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
                     method: "GET",
                     credentials: "include",
                 })

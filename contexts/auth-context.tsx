@@ -3,7 +3,6 @@
 import { createContext, useContext, useState, type ReactNode, useEffect } from "react"
 import {fetchLoginInformation} from "../lib/api"
 import Cookies from "js-cookie";
-import {API_URL} from "@/src/config";
 
 interface AuthContextType {
   isLoggedIn: boolean
@@ -21,7 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async () => {
     console.log("login start")
-    const res = await fetch(`${API_URL}/api/v1/admins/me`, { credentials: "include" });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admins/me`, { credentials: "include" });
     const data = await res.json()
     if (res.ok && data.isLoggedIn) {
       console.log("로그인 성공 확인됨");
@@ -35,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     console.log("전체 쿠키:", document.cookie);
     console.log("XSRF-TOKEN from js-cookie:", Cookies.get("XSRF-TOKEN"));
 
-    const res = await fetch(`${API_URL}/logout`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
       method: "POST",
       credentials: "include",
       headers: {

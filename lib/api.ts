@@ -1,9 +1,7 @@
-import { API_URL } from '@/src/config';
-
 
 export async function fetchLoginInformation() {
     try {
-        const response = await fetch(`${API_URL}/api/v1/admins/me`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admins/me`, {
             credentials: 'include'
         });
         const data = await response.json();
@@ -21,7 +19,7 @@ export async function fetchLoginInformation() {
 
 export async function fetchUpdatePost(postId: number, data: any) {
     try {
-        const response = await fetch(`${API_URL}/api/v1/posts/${postId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}`, {
             method: "PATCH",
             credentials: "include",
             headers: {
@@ -46,7 +44,7 @@ export async function fetchUpdatePost(postId: number, data: any) {
 
 export async function fetchUpdateDraftPost(postId: number, data: any) {
     try {
-        const response = await fetch(`${API_URL}/api/v1/drafts/${postId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drafts/${postId}`, {
             method: "PATCH",
             credentials: "include",
             headers: {
@@ -73,7 +71,7 @@ export async function fetchRecentPosts() {
     // 본문 제외 모든 정보가 필요함.
     // 최근 6개의 글만 가져오기
     try{
-        const response = await fetch(`${API_URL}/api/v1/posts?limit=6&is_published=true`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts?limit=6&is_published=true`, {
             method: 'GET',
             credentials: 'include'
         })
@@ -88,7 +86,7 @@ export async function fetchRecentPosts() {
 
 export async function fetchCategoriesAndPostsCount() {
     try{
-        const response = await fetch(`${API_URL}/api/v1/categories`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
             method: 'GET',
             credentials: 'include'
         })
@@ -114,7 +112,7 @@ export async function fetchCategoriesAndPostsCount() {
 
 export async function fetchPost({postId}: { postId: number }) {
     try{
-        const response = await fetch(`${API_URL}/api/v1/posts`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts`, {
             method: 'GET',
             credentials: 'include'
         })
@@ -128,7 +126,7 @@ export async function fetchPost({postId}: { postId: number }) {
 
 export async function fetchDraft({postId}: { postId: number }) {
     try{
-        const response = await fetch(`${API_URL}/api/v1/drafts`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drafts`, {
             method: 'GET',
             credentials: 'include'
         })
@@ -142,7 +140,7 @@ export async function fetchDraft({postId}: { postId: number }) {
 
 export async function fetchAllPosts() {
     try{
-        const response = await fetch(`${API_URL}/api/v1/posts?is_published=true`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts?is_published=true`, {
             method: 'GET',
             credentials: 'include'
         })
@@ -157,7 +155,7 @@ export async function fetchAllPosts() {
 
 export async function fetchAllDraftPosts() {
     try{
-        const response = await fetch(`${API_URL}/api/v1/drafts`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drafts`, {
             method: 'GET',
             credentials: 'include'
         })
@@ -173,7 +171,7 @@ export async function fetchAllDraftPosts() {
 
 export async function fetchCategoriesRecent() {
     try{
-        const response = await fetch(`${API_URL}/api/v1/categories/recent`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories/recent`, {
             method: 'GET',
             credentials: 'include'
         })
@@ -245,7 +243,7 @@ export async function fetchStatics() {
 export async function fetchSavePost(data: any) {
     try{
         console.log(data);
-        const response = await fetch(`${API_URL}/api/v1/posts`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -265,7 +263,7 @@ export async function fetchSavePost(data: any) {
 export async function fetchSaveCategory(data: any) {
     try{
         console.log(data);
-        const response = await fetch(`${API_URL}/api/v1/categories`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -285,7 +283,7 @@ export async function fetchSaveCategory(data: any) {
 export async function fetchSaveDraftPost(data: any) {
     try{
         console.log(data);
-        const response = await fetch(`${API_URL}/api/v1/drafts`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drafts`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -304,7 +302,7 @@ export async function fetchSaveDraftPost(data: any) {
 
 export async function deletePost(postId: number) {
     try {
-        const response = await fetch(`${API_URL}/api/v1/posts/${postId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}`, {
             method: "DELETE",
             credentials: "include",
         })
@@ -330,7 +328,7 @@ export async function deletePost(postId: number) {
 
 export async function fetchPublishDraftPost(postId: number) {
     try{
-        const response = await fetch(`${API_URL}/api/v1/drafts/${postId}/publish`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/drafts/${postId}/publish`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -348,7 +346,7 @@ export async function fetchPublishDraftPost(postId: number) {
 
 export async function fetchDeleteCategory(categoryId: number) {
     try {
-        const response = await fetch(`${API_URL}/api/v1/categories/${categoryId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories/${categoryId}`, {
             method: "DELETE",
             credentials: "include",
         })
@@ -375,7 +373,7 @@ export async function fetchDeleteCategory(categoryId: number) {
 
 export async function fetchUpdateCategory(categoryId: number, data: any) {
     try {
-        const response = await fetch(`${API_URL}/api/v1/categories/${categoryId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories/${categoryId}`, {
             method: "PATCH",
             credentials: "include",
             headers: {

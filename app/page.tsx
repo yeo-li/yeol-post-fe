@@ -8,7 +8,6 @@ import { Calendar, Clock, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { NewsletterForm } from "@/components/newsletter-form"
 import { getRecentPosts } from "@/lib/data"
-import {API_URL} from "@/src/config";
 
 // Summary 처리 함수
 function getDisplaySummary(summary: string, content = "", maxLength = 120): string {
@@ -42,7 +41,7 @@ export default function HomePage() {
     }
     const fetchAdminName = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/v1/admins/me`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admins/me`, {
           credentials: "include",
         })
         const data = await res.json()

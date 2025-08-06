@@ -1,1 +1,1 @@
-export const API_URL = "https://api.yeo-li.com";
+export const babo = "https://api.yeo-li.com";
