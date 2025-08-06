@@ -189,10 +189,10 @@ export default function DynamicCategoryPage() {
                               <Calendar className="h-3 w-3" />
                                 {post.published_at?.split("T")[0]}
                             </span>
-                                                        <span className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                                                            {post.readTime || "5분"}
-                            </span>
+                            {/*                            <span className="flex items-center gap-1">*/}
+                            {/*  <Clock className="h-3 w-3" />*/}
+                            {/*                                {post.readTime || "5분"}*/}
+                            {/*</span>*/}
                                                     </div>
                                                 </div>
 
@@ -232,7 +232,7 @@ export default function DynamicCategoryPage() {
                                     <p className="text-sm text-muted-foreground">다양한 주제의 글들을 둘러보세요</p>
                                 </CardHeader>
                                 <CardContent className="space-y-3">
-                                    {otherCategories.map((category) => (
+                                    {otherCategories.filter(cat => cat.post_count > 0).map((category) => (
                                         <Link key={category.category_name} href={`/categories/${category.category_name.replace("/", "-")}`}>
                                             <div className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer group my-2">
                                                 <div className="flex items-center gap-3">

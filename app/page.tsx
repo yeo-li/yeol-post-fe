@@ -70,11 +70,10 @@ export default function HomePage() {
             <div className="max-w-4xl mx-auto">
               <p className="text-sm text-muted-foreground mb-4">Welcome to my blog</p>
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight">
-                {adminMessage ?? "안녕하세요, 서여입니다."}
+                {adminMessage ?? "안녕하세요, 박성열입니다."}
               </h1>
               <p className="text-base md:text-lg text-muted-foreground mb-6 md:mb-8 leading-relaxed max-w-3xl">
-                개발과 디자인에 관심이 ���은 블로거입니다. 일상의 작은 발견들을 글로 기록하며, 더 나은 웹을 만들기 위해
-                노력하고 있습니다.
+                아키텍트가 되고 싶은 백엔드 개발자 지망생입니다. 더 견고한 웹을 만들기 위해 노력하고 있습니다.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                 <Link href="/about">
@@ -125,10 +124,10 @@ export default function HomePage() {
                           <Calendar className="h-3 w-3" />
                           {post.published_at?.split("T")[0]}
                         </span>
-                            <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                              {post.readTime ?? "5분"}
-                        </span>
+                        {/*    <span className="flex items-center gap-1">*/}
+                        {/*  /!*<Clock className="h-3 w-3" />*!/*/}
+                        {/*  /!*    {post.readTime ?? "5분"}*!/*/}
+                        {/*</span>*/}
                           </div>
                         </div>
                         <h3 className="font-semibold group-hover:text-primary transition-colors line-clamp-2 min-h-[3rem]">
@@ -159,8 +158,11 @@ export default function HomePage() {
           <div className="container px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-2xl md:text-3xl font-bold mb-4">새 글 알림 받기</h2>
+              {/*<p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8">*/}
+              {/*  새로운 블로그 포스트가 올라올 때마다 이메일로 알림을 받아보세요*/}
+              {/*</p>*/}
               <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8">
-                새로운 블로그 포스트가 올라올 때마다 이메일로 알림을 받아보세요
+                아직 기능이 구현되지 않았습니다. 조금만 기다려주세요!
               </p>
               <NewsletterForm />
             </div>

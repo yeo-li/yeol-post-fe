@@ -53,7 +53,21 @@ interface Post {
 function PostWriteContent() {
     const searchParams = useSearchParams()
     const router = useRouter()
-    const postId = searchParams.get("id")
+
+    const qsPostId = searchParams.get("postId") ?? searchParams.get("id");
+
+    // 2) window.location.search 로직
+    const [postId, setPostId] = useState<string | null>(null);
+    useEffect(() => {
+        // 클라이언트 마운트 시 window.location.search 읽기
+        const raw = window.location.search;                // "?postId=123" 등
+        const params = new URLSearchParams(raw);
+        const idFromSearch = params.get("postId") ?? params.get("id");
+        // 우선 window.location.search 값이 있으면 그걸 쓰고, 없으면 useSearchParams 값을 쓴다
+        setPostId(idFromSearch ?? qsPostId);
+    }, [qsPostId]);
+
+    //searchParams.get("id")
     const isEditMode = !!postId
     const { theme } = useTheme()
 
@@ -93,6 +107,8 @@ function PostWriteContent() {
 
     const [adminName, setAdminName] = useState("서여")
     const [adminId, setAdminId] = useState(1)
+
+    console.log("asdfasdfasd: " + postId);
 
 
     // 변경사항 감지 함수
@@ -280,7 +296,7 @@ function PostWriteContent() {
 
     useEffect(() => {
         const id = searchParams.get('postId');
-        if (id) setPost_id(Number(id));
+        if (id) setPostId(id);
     }, [searchParams]);
 
     // 반응형 프리뷰 모드
@@ -314,8 +330,16 @@ function PostWriteContent() {
     // 저장/수정 로직 분리
     const handleSave = async (asDraft = false) => {
         if (!title.trim()) {
-            alert("제목을 입력해주세요.")
-            return
+            alert("제목을 입력해주세요.");
+            return;
+        }
+        if (!category) {
+            alert("카테고리를 선택해주세요.");
+            return;
+        }
+        if (!content.trim()) {
+            alert("본문을 입력해주세요.");
+            return;
         }
 
         setIsSaving(true)
@@ -332,51 +356,41 @@ function PostWriteContent() {
         }
 
         try {
-            if (isEditMode && postId) {
-                // 수정 모드: PATCH 요청
-                setTimeout(async () => {
-                    setIsSaving(false)
-                    setHasUnsavedChanges(false)
-                    if (asDraft) {
-                        await fetchUpdateDraftPost(Number(postId), postData);
-                        alert("임시저장되었습니다!")
-                    } else {
-                        if (isDraftMode) {
-                            await fetchUpdateDraftPost(Number(postId), postData);
-                            await fetchPublishDraftPost(Number(postId));
-                            alert("게시물이 출간되었습니다!")
-                            router.push("/admin");
-                        } else {
-                            await fetchUpdatePost(Number(postId), postData);
-                            alert("게시물이 수정되었습니다!");
-                            router.back();
-                        }
-                    }
-                }, 0)
+            // Unified save/publish/draft logic
+            if (asDraft) {
+                if (postId == null) {
+                    // first-time draft save
+                    const response = await fetchSaveDraftPost(postData);
+                    alert("임시저장되었습니다!");
+                    // redirect to the draft edit page for the new post
+                    router.push(`/admin/write?postId=${response.post_id}`);
+                } else {
+                    // subsequent draft update
+                    await fetchUpdateDraftPost(Number(postId), postData);
+                    alert("임시저장되었습니다!");
+                }
             } else {
-                // 새 게시물 작성 모드: POST 요청
-                console.log("생성:", postData)
-
-                setTimeout(async () => {
-                    setIsSaving(false)
-                    setHasUnsavedChanges(false) // 저장 완료 후 변경사항 플래그 리셋
-                    if (asDraft) {
-                        if(postId == null) {
-                            const response = await fetchSaveDraftPost(postData);
-                            alert("임시저장되었습니다!")
-                            // 임시 저장 후 /admin/write?id={postId}로 라우트
-                            router.push("/admin/write?postId=" + response.post_id);
-                        } else {
-                            // update 로직 을 안만들어도되네? 왜지
-                        }
+                // Publishing flow
+                if (postId == null) {
+                    // direct publish for new posts
+                    const response = await fetchSavePost(postData);
+                    alert("게시물이 출간되었습니다!");
+                } else {
+                    if (isDraftMode) {
+                        // convert draft to published
+                        await fetchUpdateDraftPost(Number(postId), postData);
+                        await fetchPublishDraftPost(Number(postId));
                     } else {
-                        // await fetchPublishDraftPost(postData);
-                        await fetchSavePost(postData);
-                        alert("게시물이 출간되었습니다!")
-                        router.push("/admin")
+                        // update already published post
+                        await fetchUpdatePost(Number(postId), postData);
                     }
-                })
+                    alert("게시물이 출간되었습니다!");
+                }
+                // after publish, go back to admin list
+                router.push("/admin");
             }
+            setIsSaving(false)
+            setHasUnsavedChanges(false)
         } catch (error) {
             setIsSaving(false)
             alert("저장 중 오류가 발생했습니다.")
@@ -537,15 +551,17 @@ function PostWriteContent() {
                                         삭제
                                     </Button>
                                 )}
-                                <Button
-                                    variant="outline"
-                                    onClick={() => handleSave(true)}
-                                    disabled={isSaving || isDeleting}
-                                    className="gap-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white bg-transparent"
-                                >
-                                    <Save className="h-4 w-4" />
-                                    {isSaving ? "저장 중..." : "임시저장"}
-                                </Button>
+                                {(!isEditMode || isDraftMode) && (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => handleSave(true)}
+                                        disabled={isSaving || isDeleting}
+                                        className="gap-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white bg-transparent"
+                                    >
+                                        <Save className="h-4 w-4" />
+                                        {isSaving ? "저장 중..." : "임시저장"}
+                                    </Button>
+                                )}
                                 <Button
                                     onClick={() => handleSave(false)}
                                     disabled={isSaving || isDeleting}
@@ -647,7 +663,7 @@ function PostWriteContent() {
 
                                 <div className="flex gap-2">
                                     <Input
-                                        placeholder="태그 입력 (최대 10개)"
+                                        placeholder="태그 입력"
                                         value={tagInput ?? ""}
                                         onChange={(e) => setTagInput(e.target.value)}
                                         onKeyPress={handleKeyPress}

@@ -103,7 +103,7 @@ export default function CategoriesPage() {
 
           {/* Categories Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 md:mb-20 lg:mb-24">
-            {categories.map((category) => {
+            {categories.filter(cat => cat.post_count > 0).map((category) => {
               const colorClasses = getCategoryColorClasses(category.category_color)
               return (
                   <Card

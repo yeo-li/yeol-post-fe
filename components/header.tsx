@@ -53,8 +53,12 @@ export function Header() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6 lg:px-8">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-full bg-foreground" />
-            <span className="font-bold text-xl">블로그</span>
+            {/*<span className="font-bold text-xl">*/}
+            {/*  <span className="text-xl font-mono">@𝐲𝐞𝐨_𝐥𝐢</span>*/}
+            {/*</span>*/}
+            <span className="font-bold text-xl">
+              <span className="text-xl font-mono">@𝒚𝒆𝒐_𝒍𝒊</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -105,38 +109,12 @@ export function Header() {
               </Button>
             )}
 
-            <Button variant="ghost" size="icon" onClick={toggleTheme} className="hover:bg-muted relative">
-              <Moon
-                className={`h-5 w-5 transition-all ${
-                  theme === "system"
-                    ? "scale-0 -rotate-90"
-                    : resolvedTheme === "dark"
-                    ? "scale-100 rotate-0"
-                    : "scale-0 -rotate-90"
-                }`}
-              />
-              <Sun
-                className={`absolute h-5 w-5 transition-all ${
-                  theme === "system"
-                    ? "scale-0 rotate-90"
-                    : resolvedTheme === "light"
-                    ? "scale-100 rotate-0"
-                    : "scale-0 rotate-90"
-                }`}
-              />
-              <SystemIcon
-                className={`absolute h-5 w-5 transition-all ${
-                  theme === "system" ? "scale-100 rotate-0" : "scale-0"
-                }`}
-              />
-              <span className="sr-only">테마 토글</span>
-            </Button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
         <div className="md:hidden border-t bg-background/95">
-          <div className="container mx-auto flex items-center justify-center py-2 px-4">
+          <div className="container mx-auto flex items-center justify-center space-x-6 py-2 px-4">
             {navLinks.map(({ href, label }) => (
               <Link
                 key={href}
@@ -148,7 +126,7 @@ export function Header() {
             ))}
             {isLoggedIn && (
               <button onClick={goToAdmin} className="text-muted-foreground hover:text-foreground transition-colors ml-6">
-                관리자
+                관리
               </button>
             )}
           </div>

@@ -9,8 +9,7 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-3 md:mb-4 text-base md:text-lg">소개</h3>
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-              개발과 디자인에 관심이 많은 블로거입니다. 일상의 작은 발견들을 글로 기록하며, 더 나은 웹을 만들기 위해
-              노력하고 있습니다.
+              아키텍트가 되고 싶은 백엔드 개발자 지망생입니다. <br></br> 더 견고한 웹을 만들기 위해 노력하고 있습니다.
             </p>
           </div>
 
@@ -32,13 +31,10 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4">연결</h3>
             <div className="flex space-x-4">
-              <Link href="#" className="text-muted-foreground hover:text-foreground">
+              <Link href="https://github.com/yeo-li" className="text-muted-foreground hover:text-foreground">
                 <Github className="h-5 w-5" />
               </Link>
-              <Link href="#" className="text-muted-foreground hover:text-foreground">
-                <Twitter className="h-5 w-5" />
-              </Link>
-              <Link href="#" className="text-muted-foreground hover:text-foreground">
+              <Link href="mailto:uio6699@naver.com" className="text-muted-foreground hover:text-foreground">
                 <Mail className="h-5 w-5" />
               </Link>
             </div>
@@ -46,7 +42,7 @@ export function Footer() {
         </div>
 
         <div className="border-t mt-6 md:mt-8 lg:mt-12 pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center text-sm md:text-base text-muted-foreground gap-3 md:gap-0">
-          <p>© 2024 김블로거. All rights reserved.</p>
+          <p>© 2025 서여. All rights reserved.</p>
           <p className="flex items-center gap-1">
             Made with <Heart className="h-4 w-4 text-red-500" /> and Next.js
           </p>

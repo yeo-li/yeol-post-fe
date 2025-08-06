@@ -145,13 +145,13 @@ export default function AllPostsPage() {
             </Card>
             <Card>
               <CardContent className="p-3 md:p-4 lg:p-6 text-center">
-                <div className="text-xl md:text-2xl lg:text-3xl font-bold mb-1">{averageReadTime || 5}분</div>
-                <div className="text-xs md:text-sm text-muted-foreground">평균 읽기 시간</div>
+                <div className="text-xl md:text-2xl lg:text-3xl font-bold mb-1">{averageReadTime || 5}</div>
+                <div className="text-xs md:text-sm text-muted-foreground">태그 수</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-3 md:p-4 lg:p-6 text-center">
-                <div className="text-xl md:text-2xl lg:text-3xl font-bold mb-1">2024</div>
+                <div className="text-xl md:text-2xl lg:text-3xl font-bold mb-1">2025</div>
                 <div className="text-xs md:text-sm text-muted-foreground">블로그 시작</div>
               </CardContent>
             </Card>
