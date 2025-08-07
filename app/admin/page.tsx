@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer"
 import {
   Search,
   Eye,
@@ -20,6 +21,7 @@ import {
   Loader2,
   Lock,
   Save,
+  Menu,
 } from "lucide-react"
 import { fetchAllPosts, deletePost, fetchLoginInformation } from "@/lib/api"
 import Link from "next/link"
@@ -73,6 +75,36 @@ function calculateReadTime(content: string): string {
   return `${readTime}분`
 }
 
+const SidebarContent = ({ userInfo, onNavigate }: { userInfo: any, onNavigate: (path: string) => void }) => (
+    <div>
+        <div className="mb-6 md:mb-8">
+            <div className="flex items-center gap-2 mb-2">
+                <div className="w-5 h-5 md:w-6 md:h-6 bg-foreground rounded-full"></div>
+                <span className="font-semibold text-sm md:text-base">{userInfo?.nickname || "관리자"}</span>
+            </div>
+            <p className="text-xs md:text-sm text-muted-foreground">관리자</p>
+        </div>
+        <nav className="space-y-2">
+            {sidebarItems.map((item) => (
+                <Button
+                    key={item.label}
+                    variant={item.active ? "default" : "ghost"}
+                    className={`w-full justify-start gap-2 ${
+                        item.active
+                            ? "bg-foreground text-background hover:bg-foreground/90"
+                            : "text-foreground hover:bg-muted"
+                    }`}
+                    onClick={() => onNavigate(item.href)}
+                >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                </Button>
+            ))}
+        </nav>
+    </div>
+);
+
+
 export default function AdminPage() {
   const router = useRouter()
   const [posts, setPosts] = useState<Post[]>([])
@@ -81,6 +113,7 @@ export default function AdminPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [postToDelete, setPostToDelete] = useState<Post | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   // 로그인 상태 관리
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null)
@@ -207,48 +240,32 @@ export default function AdminPage() {
     }
   }
 
-  const handleViewDrafts = () => {
-    router.push("/admin/drafts")
+  const handleNavigation = (path: string) => {
+      router.push(path);
+      setIsDrawerOpen(false);
   }
 
   return (
       <div className="min-h-screen bg-background">
         <div className="flex flex-col lg:flex-row">
-          {/* Sidebar */}
-          <div className="w-full lg:w-64 border-b lg:border-r lg:border-b-0 bg-muted/10 p-4 md:p-6">
-            <div className="mb-6 md:mb-8">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-5 h-5 md:w-6 md:h-6 bg-foreground rounded-full"></div>
-                <span className="font-semibold text-sm md:text-base">{userInfo?.nickname || "관리자"}</span>
-              </div>
-              <p className="text-xs md:text-sm text-muted-foreground">관리자</p>
-            </div>
-
-            <nav className="space-y-2">
-              {sidebarItems.map((item) => (
-                  <Button
-                      key={item.label}
-                      variant={item.active ? "default" : "ghost"}
-                      className={`w-full justify-start gap-2 ${
-                          item.active
-                              ? "bg-foreground text-background hover:bg-foreground/90"
-                              : "text-foreground hover:bg-muted"
-                      }`}
-                      onClick={() => router.push(item.href)}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    {item.label}
-                  </Button>
-              ))}
-            </nav>
+          {/* Sidebar for Desktop */}
+          <div className="hidden lg:flex lg:w-64 border-r bg-muted/10 p-4 md:p-6 flex-col">
+            <SidebarContent userInfo={userInfo} onNavigate={handleNavigation} />
           </div>
 
           {/* Main Content */}
           <div className="flex-1 p-4 md:p-6 lg:p-8">
             {/* Header */}
-            <div className="mb-6 md:mb-8">
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">포스트 관리</h1>
-              <p className="text-sm md:text-base text-muted-foreground">{posts.length}개의 출간된 포스트가 있습니다</p>
+            <div className="flex items-center justify-between mb-6 md:mb-8">
+                <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setIsDrawerOpen(true)}>
+                        <Menu className="h-6 w-6" />
+                    </Button>
+                    <div>
+                        <h1 className="text-2xl md:text-3xl font-bold">포스트 관리</h1>
+                        <p className="text-sm md:text-base text-muted-foreground">{posts.length}개의 출간된 포스트가 있습니다</p>
+                    </div>
+                </div>
             </div>
 
             {/* Actions */}
@@ -263,17 +280,6 @@ export default function AdminPage() {
                 />
               </div>
               <div className="flex gap-2">
-                {/*<Button*/}
-                {/*    variant="outline"*/}
-                {/*    onClick={handleViewDrafts}*/}
-                {/*    className="gap-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white bg-transparent"*/}
-                {/*>*/}
-                {/*  <Save className="h-4 w-4" />*/}
-                {/*  임시저장 목록*/}
-                {/*</Button>*/}
-                {/*<Button onClick={handleNewPost} className="gap-2 bg-foreground text-background hover:bg-foreground/90">*/}
-                {/*  <Plus className="h-4 w-4" />새 포스트 작성*/}
-                {/*</Button>*/}
                 <Button onClick={handleNewPost} className="gap-2 bg-foreground text-background hover:bg-foreground/90">
                   <FileText className="h-4 w-4" />새 글 작성
                 </Button>
@@ -306,22 +312,22 @@ export default function AdminPage() {
                   filteredPosts.map((post) => (
                       <Card key={post.postId} className="hover:shadow-md transition-shadow">
                         <CardContent className="p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div className="flex-1 md:mb-0">
+                              <div className="flex items-center gap-2 mb-2 flex-wrap">
                                 <Badge variant="default" className="bg-green-600 hover:bg-green-700">
                                   출간됨
                                 </Badge>
                                 <Badge variant="secondary">{post.category.category_name}</Badge>
-                                <div className="flex items-center text-xs text-muted-foreground gap-4">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              {formatDate(post.published_at)}
-                            </span>
+                                <div className="flex items-center text-xs text-muted-foreground gap-4 flex-wrap">
                                   <span className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
+                                    <Calendar className="h-3 w-3" />
+                                    {formatDate(post.published_at)}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="h-3 w-3" />
                                     {calculateReadTime(post.content)}
-                            </span>
+                                  </span>
                                   <span className="text-muted-foreground">작성자: {post.author}</span>
                                 </div>
                               </div>
@@ -337,7 +343,7 @@ export default function AdminPage() {
                                 ))}
                               </div>
                             </div>
-                            <div className="flex items-center gap-2 ml-4">
+                            <div className="flex items-center gap-2 self-end md:self-auto md:ml-4">
                               <Button
                                   variant="ghost"
                                   size="icon"
@@ -398,6 +404,15 @@ export default function AdminPage() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Drawer Sidebar */}
+        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+            <DrawerContent>
+                <div className="p-4">
+                    <SidebarContent userInfo={userInfo} onNavigate={handleNavigation} />
+                </div>
+            </DrawerContent>
+        </Drawer>
 
         {/* 삭제 확인 다이얼로그 */}
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

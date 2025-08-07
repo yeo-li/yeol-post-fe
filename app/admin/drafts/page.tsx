@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import {
     Search,
     Eye,
@@ -19,8 +20,9 @@ import {
     Loader2,
     Lock,
     Save,
+    Menu,
 } from "lucide-react"
-import {fetchAllPosts, deletePost, fetchLoginInformation, fetchAllDraftPosts} from "@/lib/api"
+import { deletePost, fetchLoginInformation, fetchAllDraftPosts } from "@/lib/api"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -72,6 +74,35 @@ function calculateReadTime(content: string): string {
     return `${readTime}분`
 }
 
+const SidebarContent = ({ userInfo, onNavigate }: { userInfo: any, onNavigate: (path: string) => void }) => (
+    <div>
+        <div className="mb-6 md:mb-8">
+            <div className="flex items-center gap-2 mb-2">
+                <div className="w-5 h-5 md:w-6 md:h-6 bg-foreground rounded-full"></div>
+                <span className="font-semibold text-sm md:text-base">{userInfo?.nickname || "관리자"}</span>
+            </div>
+            <p className="text-xs md:text-sm text-muted-foreground">관리자</p>
+        </div>
+        <nav className="space-y-2">
+            {sidebarItems.map((item) => (
+                <Button
+                    key={item.label}
+                    variant={item.active ? "default" : "ghost"}
+                    className={`w-full justify-start gap-2 ${
+                        item.active
+                            ? "bg-foreground text-background hover:bg-foreground/90"
+                            : "text-foreground hover:bg-muted"
+                    }`}
+                    onClick={() => onNavigate(item.href)}
+                >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                </Button>
+            ))}
+        </nav>
+    </div>
+);
+
 export default function AdminDraftsPage() {
     const router = useRouter()
     const [posts, setPosts] = useState<Post[]>([])
@@ -80,6 +111,7 @@ export default function AdminDraftsPage() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [postToDelete, setPostToDelete] = useState<Post | null>(null)
     const [deleting, setDeleting] = useState(false)
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
     // 로그인 상태 관리
     const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null)
@@ -200,50 +232,36 @@ export default function AdminDraftsPage() {
         }
     }
 
+    const handleNavigation = (path: string) => {
+        router.push(path);
+        setIsDrawerOpen(false);
+    }
+
     return (
         <div className="min-h-screen bg-background">
             <div className="flex flex-col lg:flex-row">
-                {/* Sidebar */}
-                <div className="w-full lg:w-64 border-b lg:border-r lg:border-b-0 bg-muted/10 p-4 md:p-6">
-                    <div className="mb-6 md:mb-8">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="w-5 h-5 md:w-6 md:h-6 bg-foreground rounded-full"></div>
-                            <span className="font-semibold text-sm md:text-base">{userInfo?.nickname || "관리자"}</span>
-                        </div>
-                        <p className="text-xs md:text-sm text-muted-foreground">관리자</p>
-                    </div>
-
-                    <nav className="space-y-2">
-                        {sidebarItems.map((item) => (
-                            <Button
-                                key={item.label}
-                                variant={item.active ? "default" : "ghost"}
-                                className={`w-full justify-start gap-2 ${
-                                    item.active
-                                        ? "bg-foreground text-background hover:bg-foreground/90"
-                                        : "text-foreground hover:bg-muted"
-                                }`}
-                                onClick={() => router.push(item.href)}
-                            >
-                                <item.icon className="h-4 w-4" />
-                                {item.label}
-                            </Button>
-                        ))}
-                    </nav>
+                {/* Sidebar for Desktop */}
+                <div className="hidden lg:flex lg:w-64 border-r bg-muted/10 p-4 md:p-6 flex-col">
+                    <SidebarContent userInfo={userInfo} onNavigate={handleNavigation} />
                 </div>
 
                 {/* Main Content */}
                 <div className="flex-1 p-4 md:p-6 lg:p-8">
                     {/* Header */}
-                    <div className="mb-6 md:mb-8">
-                        <div className="flex items-center gap-3 mb-4">
-                            <Save className="h-6 w-6 text-amber-600" />
-                            <h1 className="text-2xl md:text-3xl font-bold">임시저장 목록</h1>
+                    <div className="flex items-center justify-between mb-6 md:mb-8">
+                        <div className="flex items-center gap-4">
+                            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setIsDrawerOpen(true)}>
+                                <Menu className="h-6 w-6" />
+                            </Button>
+                            <div className="flex items-center gap-3">
+                                <Save className="h-6 w-6 text-amber-600" />
+                                <h1 className="text-2xl md:text-3xl font-bold">임시저장 목록</h1>
+                            </div>
                         </div>
-                        <p className="text-sm md:text-base text-muted-foreground">
-                            아직 출간하지 않은 임시저장된 글들을 관리할 수 있습니다. 총 {posts.length}개의 임시저장 글이 있습니다.
-                        </p>
                     </div>
+                    <p className="text-sm md:text-base text-muted-foreground mb-6">
+                        아직 출간하지 않은 임시저장된 글들을 관리할 수 있습니다. 총 {posts.length}개의 임시저장 글이 있습니다.
+                    </p>
 
                     {/* Search */}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 gap-4">
@@ -288,23 +306,23 @@ export default function AdminDraftsPage() {
                             filteredPosts.map((post) => (
                                 <Card key={post.postId} className="hover:shadow-md transition-shadow border-l-4 border-l-amber-500">
                                     <CardContent className="p-4">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2 mb-2">
+                                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                            <div className="flex-1 md:mb-0">
+                                                <div className="flex items-center gap-2 mb-2 flex-wrap">
                                                     <Badge variant="outline" className="text-amber-600 border-amber-600">
                                                         <Save className="h-3 w-3 mr-1" />
                                                         임시저장
                                                     </Badge>
                                                     <Badge variant="secondary">{post.category.category_name}</Badge>
-                                                    <div className="flex items-center text-xs text-muted-foreground gap-4">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                                {formatDate(post.published_at)}
-                            </span>
+                                                    <div className="flex items-center text-xs text-muted-foreground gap-4 flex-wrap">
                                                         <span className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
+                                                          <Calendar className="h-3 w-3" />
+                                                            {formatDate(post.published_at)}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                          <Clock className="h-3 w-3" />
                                                             {calculateReadTime(post.content)}
-                            </span>
+                                                        </span>
                                                         <span className="text-muted-foreground">작성자: {post.author}</span>
                                                     </div>
                                                 </div>
@@ -320,7 +338,7 @@ export default function AdminDraftsPage() {
                                                     ))}
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2 ml-4">
+                                            <div className="flex items-center gap-2 self-end md:self-auto md:ml-4">
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
@@ -381,6 +399,15 @@ export default function AdminDraftsPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Mobile Drawer Sidebar */}
+            <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                <DrawerContent>
+                    <div className="p-4">
+                        <SidebarContent userInfo={userInfo} onNavigate={handleNavigation} />
+                    </div>
+                </DrawerContent>
+            </Drawer>
 
             {/* 삭제 확인 다이얼로그 */}
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
