@@ -9,6 +9,28 @@ import Link from "next/link"
 import { NewsletterForm } from "@/components/newsletter-form"
 import { getRecentPosts } from "@/lib/data"
 
+// 날짜 포맷팅 함수
+function formatDate(dateString: string): string {
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  } catch {
+    return dateString
+  }
+}
+
+// 읽기 시간 계산 함수 (대략적으로 계산)
+function calculateReadTime(content: string): string {
+  const wordsPerMinute = 200
+  const wordCount = content.length / 2 // 한글 기준 대략적 계산
+  const readTime = Math.ceil(wordCount / wordsPerMinute)
+  return `${readTime}분`
+}
+
 // Summary 처리 함수
 function getDisplaySummary(summary: string, content = "", maxLength = 120): string {
   // summary가 있고 비어있지 않은 경우
@@ -114,28 +136,28 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {recentPosts.map((post) => (
-                  <Link key={post.postId} href={`/posts/${post.postId}`}>
-                    <Card className="group hover:shadow-lg transition-shadow h-[280px] flex flex-col">
+                  <Link key={post.postId} href={`/posts/${post.postId}`} className="block">
+                    <Card className="group hover:shadow-lg transition-shadow h-[300px] flex flex-col">
                       <CardHeader className="pb-3 flex-shrink-0">
                         <div className="flex items-center justify-between mb-3">
                           {post.category && <Badge variant="secondary">{post.category.category_name}</Badge>}
-                          <div className="flex items-center text-xs text-muted-foreground gap-4">
+                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 gap-4">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          {post.published_at?.split("T")[0]}
+                          {formatDate(post.published_at)}
                         </span>
-                        {/*    <span className="flex items-center gap-1">*/}
-                        {/*  /!*<Clock className="h-3 w-3" />*!/*/}
-                        {/*  /!*    {post.readTime ?? "5분"}*!/*/}
-                        {/*</span>*/}
+                            <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                              {calculateReadTime(post.content)}
+                        </span>
                           </div>
                         </div>
-                        <h3 className="font-semibold group-hover:text-primary transition-colors line-clamp-2 min-h-[3rem]">
+                        <h3 className="font-semibold text-2xl group-hover:text-primary transition-colors line-clamp-2 min-h-[3rem]">
                           {post.title}
                         </h3>
                       </CardHeader>
                       <CardContent className="flex-1 flex flex-col justify-between">
-                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-1 leading-relaxed">
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-grow leading-relaxed">
                           {getDisplaySummary(post.summary, post.content)}
                         </p>
                         <div className="flex flex-wrap gap-1 mt-auto">

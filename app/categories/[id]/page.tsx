@@ -8,6 +8,40 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
+interface Post {
+  postId: number
+  title: string
+  summary: string
+  content: string
+  published_at: string
+  category: {
+    category_name: string
+  }
+  tags: string[]
+}
+
+// 날짜 포맷팅 함수
+function formatDate(dateString: string): string {
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+  } catch {
+    return dateString
+  }
+}
+
+// 읽기 시간 계산 함수 (대략적으로 계산)
+function calculateReadTime(content: string): string {
+  const wordsPerMinute = 200
+  const wordCount = content.length / 2 // 한글 기준 대략적 계산
+  const readTime = Math.ceil(wordCount / wordsPerMinute)
+  return `${readTime}분`
+}
+
 // Summary 처리 함수
 function getDisplaySummary(excerpt: string, content: string, maxLength = 120): string {
     if (excerpt && excerpt.trim()) {
@@ -175,40 +209,42 @@ export default function DynamicCategoryPage() {
                                 </Link>
                             </div>
                         ) : (
-                            <div className="space-y-8">
+                            <div className="space-y-4">
                                 {posts.map((post) => (
-                                    <Link key={post.postId} href={`/posts/${post.postId}`}>
-                                        <Card className="group hover:shadow-lg transition-all duration-300 border shadow-sm hover:shadow-xl my-4">
-                                            <CardContent className="p-6 md:p-8">
-                                                <div className="flex items-start justify-between mb-4">
-                                                    <Badge variant="secondary" className={colorClasses?.badge || "bg-gray-50 text-gray-700"}>
-                                                        {categoryName}
-                                                    </Badge>
-                                                    <div className="flex items-center text-xs text-muted-foreground gap-4">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                                {post.published_at?.split("T")[0]}
-                            </span>
-                            {/*                            <span className="flex items-center gap-1">*/}
-                            {/*  <Clock className="h-3 w-3" />*/}
-                            {/*                                {post.readTime || "5분"}*/}
-                            {/*</span>*/}
+                                    <Link key={post.postId} href={`/posts/${post.postId}`} className="block">
+                                        <Card className="group hover:shadow-lg transition-all duration-300 border shadow-sm hover:shadow-xl h-full flex flex-col">
+                                            <CardContent className="p-6 md:p-8 flex flex-col flex-grow">
+                                                <div className="flex-grow">
+                                                    <div className="flex items-start justify-between mb-4">
+                                                        <Badge variant="secondary" className={colorClasses?.badge || "bg-gray-50 text-gray-700"}>
+                                                            {categoryName}
+                                                        </Badge>
+                                                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 gap-4">
+                                                            <span className="flex items-center gap-1">
+                                                              <Calendar className="h-3 w-3" />
+                                                                {post.published_at?.split("T")[0]}
+                                                            </span>
+                                                            <span className="flex items-center gap-1">
+                                                              <Clock className="h-3 w-3" />
+                                                                {calculateReadTime(post.content)}
+                                                            </span>
+                                                        </div>
                                                     </div>
+
+                                                    <h2
+                                                        className={`text-xl md:text-2xl font-bold mb-4 transition-colors leading-tight line-clamp-2 min-h-[3.5rem] ${
+                                                            colorClasses?.hover || "group-hover:text-primary"
+                                                        }`}
+                                                    >
+                                                        {post.title}
+                                                    </h2>
+
+                                                    <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-3">
+                                                        {getDisplaySummary(post.summary, post.content, 150)}
+                                                    </p>
                                                 </div>
 
-                                                <h2
-                                                    className={`text-xl md:text-2xl font-bold mb-4 transition-colors leading-tight ${
-                                                        colorClasses?.hover || "group-hover:text-primary"
-                                                    }`}
-                                                >
-                                                    {post.title}
-                                                </h2>
-
-                                                <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-2">
-                                                    {getDisplaySummary(post.summary, post.content, 150)}
-                                                </p>
-
-                                                <div className="flex flex-wrap gap-2">
+                                                <div className="flex flex-wrap gap-2 mt-auto">
                                                     {post.tags?.map((tag: string) => (
                                                         <Badge key={tag} variant="outline" className="text-xs hover:bg-muted transition-colors">
                                                             #{tag}

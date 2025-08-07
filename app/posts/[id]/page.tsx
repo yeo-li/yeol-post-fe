@@ -172,7 +172,8 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: numbe
     const minutes = published.getMinutes().toString().padStart(2, "0")
     const ampm = hours < 12 ? "오전" : "오후"
     const hour12 = hours % 12 === 0 ? 12 : hours % 12
-    return `${year}-${month}-${date} ${ampm} ${hour12}:${minutes}`
+    // return `${year}-${month}-${date} ${ampm} ${hour12}:${minutes}`
+    return `${year}-${month}-${date}`
   }
 
   if (!post) {
@@ -228,7 +229,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: numbe
 
             {/* Subtitle */}
             {post.summary && (
-                <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">{post.summary}</p>
+                <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed break-words">{post.summary}</p>
             )}
 
             {/* Meta Info */}

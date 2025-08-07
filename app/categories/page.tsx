@@ -108,7 +108,7 @@ export default function CategoriesPage() {
               return (
                   <Card
                       key={category.category_name}
-                      className={`group hover:shadow-lg transition-all h-[280px] flex flex-col border-l-4 ${colorClasses.hover}`}
+                      className={`group hover:shadow-lg transition-all h-full flex flex-col border-l-4 ${colorClasses.hover}`}
                       style={{ borderLeftColor: category.category_color }}
                   >
                     <CardHeader className="flex-shrink-0">
@@ -124,29 +124,31 @@ export default function CategoriesPage() {
                           {category.post_count}개 글
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground line-clamp-3">
+                      <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
                         {category.category_description || "이 카테고리에 대한 설명이 없습니다."}
                       </p>
                     </CardHeader>
-                    <CardContent className="flex-1 flex flex-col justify-between">
-                      {category.latest_post && (
-                          <div
-                              className="bg-muted/50 rounded-lg p-3 mb-4 border"
-                              style={{ borderColor: `${category.category_color}20` }}
-                          >
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-                              <Calendar className="h-3 w-3" />
-                              <span>최신 글</span>
-                            </div>
-                            <p className="font-medium text-sm line-clamp-2">{category.latest_post.title}</p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {category.latest_post.published_at?.split("T")[0]}
-                            </p>
-                          </div>
-                      )}
+                    <CardContent className="flex-1 flex flex-col justify-between pt-0">
+                      <div className="flex-grow">
+                          {category.latest_post && (
+                              <div
+                                  className="bg-muted/50 rounded-lg p-3 border"
+                                  style={{ borderColor: `${category.category_color}20` }}
+                              >
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+                                  <Calendar className="h-3 w-3" />
+                                  <span>최신 글</span>
+                                </div>
+                                <p className="font-medium text-sm line-clamp-2">{category.latest_post.title}</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {category.latest_post.published_at?.split("T")[0]}
+                                </p>
+                              </div>
+                          )}
+                      </div>
                       <Button
                           variant="ghost"
-                          className="w-full justify-between group-hover:bg-primary group-hover:text-primary-foreground transition-colors mt-auto"
+                          className="w-full justify-between group-hover:bg-primary group-hover:text-primary-foreground transition-colors mt-4"
                           asChild
                       >
                         <Link href={`/categories/${category.category_name.replace("/", "-")}`}>
