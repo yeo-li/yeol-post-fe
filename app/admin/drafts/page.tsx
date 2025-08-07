@@ -315,10 +315,10 @@ export default function AdminDraftsPage() {
                                                     </Badge>
                                                     <Badge variant="secondary">{post.category.category_name}</Badge>
                                                     <div className="flex items-center text-xs text-muted-foreground gap-4 flex-wrap">
-                                                        <span className="flex items-center gap-1">
-                                                          <Calendar className="h-3 w-3" />
-                                                            {formatDate(post.published_at)}
-                                                        </span>
+                                                        {/*<span className="flex items-center gap-1">*/}
+                                                        {/*  /!*<Calendar className="h-3 w-3" />*!/*/}
+                                                        {/*  /!*  {formatDate(post.published_at)}*!/*/}
+                                                        {/*</span>*/}
                                                         <span className="flex items-center gap-1">
                                                           <Clock className="h-3 w-3" />
                                                             {calculateReadTime(post.content)}
@@ -339,15 +339,15 @@ export default function AdminDraftsPage() {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2 self-end md:self-auto md:ml-4">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="hover:bg-muted"
-                                                    onClick={() => handleViewPost(post.postId)}
-                                                    title="미리보기"
-                                                >
-                                                    <Eye className="h-4 w-4" />
-                                                </Button>
+                                                {/*<Button*/}
+                                                {/*    variant="ghost"*/}
+                                                {/*    size="icon"*/}
+                                                {/*    className="hover:bg-muted"*/}
+                                                {/*    onClick={() => handleViewPost(post.postId)}*/}
+                                                {/*    title="미리보기"*/}
+                                                {/*>*/}
+                                                {/*    <Eye className="h-4 w-4" />*/}
+                                                {/*</Button>*/}
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"

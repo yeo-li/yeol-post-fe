@@ -91,6 +91,7 @@ function PostWriteContent() {
     const [isSaving, setIsSaving] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
+    const [isAutoSaving, setIsAutoSaving] = useState(false)
     const [categories, setCategories] = useState([])
 
     // 변경사항 추적
@@ -107,8 +108,6 @@ function PostWriteContent() {
 
     const [adminName, setAdminName] = useState("서여")
     const [adminId, setAdminId] = useState(1)
-
-    console.log("asdfasdfasd: " + postId);
 
 
     // 변경사항 감지 함수
@@ -282,6 +281,36 @@ function PostWriteContent() {
         }
     }, [])
 
+    useEffect(() => {
+        const autoSaveInterval = setInterval(() => {
+            const canAutoSave =
+                title.trim() !== '' &&
+                category !== undefined &&
+                content.trim() !== '' &&
+                hasUnsavedChanges;
+
+            if (canAutoSave) {
+                setIsAutoSaving(true);
+                _performSave(true)
+                    .then(() => {
+                        setInitialData({
+                            title: title.trim(),
+                            summary: summary.trim(),
+                            content: content.trim(),
+                            category,
+                            author: author.trim(),
+                            tags: [...tags].sort(),
+                        });
+                    })
+                    .finally(() => {
+                        setIsAutoSaving(false);
+                    });
+            }
+        }, 5000); // 5초
+
+        return () => clearInterval(autoSaveInterval);
+    }, [title, category, content, hasUnsavedChanges, author, summary, tags]);
+
     // 에디터 높이 계산
     useEffect(() => {
         const calculateHeight = () => {
@@ -327,6 +356,52 @@ function PostWriteContent() {
         }
     }
 
+    // 자동저장 로직
+    const _performSave = async (asDraft = false) => {
+        if (!title.trim() || !category || !content.trim()) {
+            // 자동 저장을 위한 필수 필드가 채워지지 않은 경우, 조용히 실패
+            if (asDraft && !isEditMode) return null; 
+        }
+
+        const postData = {
+            title: title.trim(),
+            summary: summary.trim(),
+            content: content.trim(),
+            category_id: category,
+            author: author.trim() || adminName || "서여",
+            admin_id: adminId,
+            tags: tags,
+            is_published: !asDraft,
+        }
+
+        try {
+            if (asDraft) {
+                if (postId == null) {
+                    const response = await fetchSaveDraftPost(postData);
+                    // 새 게시물의 경우, 응답으로 받은 postId를 상태에 설정
+                    setPostId(response.post_id.toString());
+                    return response;
+                } else {
+                    return await fetchUpdateDraftPost(Number(postId), postData);
+                }
+            } else {
+                if (postId == null) {
+                    return await fetchSavePost(postData);
+                } else {
+                    if (isDraftMode) {
+                        await fetchUpdateDraftPost(Number(postId), postData);
+                        return await fetchPublishDraftPost(Number(postId));
+                    } else {
+                        return await fetchUpdatePost(Number(postId), postData);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Save operation failed:", error);
+            throw error; // 호출자에게 에러 전파
+        }
+    }
+
     // 저장/수정 로직 분리
     const handleSave = async (asDraft = false) => {
         if (!title.trim()) {
@@ -344,56 +419,27 @@ function PostWriteContent() {
 
         setIsSaving(true)
 
-        const postData = {
-            title: title.trim(),
-            summary: summary.trim(),
-            content: content.trim(),
-            category_id: category,
-            author: author.trim() || adminName || "서여",
-            admin_id: adminId,
-            tags: tags,
-            is_published: !asDraft, // 임시저장이면 false, 출간이면 true
-        }
-
         try {
-            // Unified save/publish/draft logic
+            const response = await _performSave(asDraft);
+
             if (asDraft) {
-                if (postId == null) {
-                    // first-time draft save
-                    const response = await fetchSaveDraftPost(postData);
-                    alert("임시저장되었습니다!");
-                    // redirect to the draft edit page for the new post
+                alert("임시저장되었습니다!");
+                if (!isEditMode && response?.post_id) {
                     router.push(`/admin/write?postId=${response.post_id}`);
-                } else {
-                    // subsequent draft update
-                    await fetchUpdateDraftPost(Number(postId), postData);
-                    alert("임시저장되었습니다!");
                 }
             } else {
-                // Publishing flow
-                if (postId == null) {
-                    // direct publish for new posts
-                    const response = await fetchSavePost(postData);
-                    alert("게시물이 출간되었습니다!");
+                if (isEditMode && !isDraftMode) {
+                    alert("게시물이 수정되었습니다!");
                 } else {
-                    if (isDraftMode) {
-                        // convert draft to published
-                        await fetchUpdateDraftPost(Number(postId), postData);
-                        await fetchPublishDraftPost(Number(postId));
-                    } else {
-                        // update already published post
-                        await fetchUpdatePost(Number(postId), postData);
-                    }
                     alert("게시물이 출간되었습니다!");
                 }
-                // after publish, go back to admin list
                 router.push("/admin");
             }
-            setIsSaving(false)
             setHasUnsavedChanges(false)
         } catch (error) {
-            setIsSaving(false)
             alert("저장 중 오류가 발생했습니다.")
+        } finally {
+            setIsSaving(false)
         }
     }
 
@@ -523,32 +569,47 @@ function PostWriteContent() {
             {/* Header */}
             <div className="border-b p-4">
                 <div className="container max-w-7xl mx-auto">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap items-center justify-between gap-y-4">
+                        {/* Back Button */}
                         <button
                             onClick={() => handleNavigation(pageInfo.backUrl)}
                             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
                         >
                             <ArrowLeft className="h-4 w-4" />
-                            {isDraftMode ? "임시저장 목록으로 돌아가기" : "관리자 대시보드로 돌아가기"}
+                            <span className="hidden sm:inline">
+                                {isDraftMode ? "임시저장 목록으로 돌아가기" : "관리자 대시보드로 돌아가기"}
+                            </span>
+                            <span className="sm:hidden"></span>
                         </button>
-                        <div className="flex items-center gap-2">
-                            {hasUnsavedChanges && (
-                                <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
-                                    <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
-                                    저장되지 않은 변경사항
+
+                        {/* Actions */}
+                        <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
+                            {/* Unsaved Changes Indicator */}
+                            {isAutoSaving && (
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <span>자동 저장 중...</span>
                                 </div>
                             )}
-                            <div className="flex gap-2">
-                                {/* Delete Button - Only show in edit mode */}
+                            {hasUnsavedChanges && !isAutoSaving && (
+                                <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 whitespace-nowrap">
+                                    <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                                    <span className="hidden sm:inline">저장되지 않은 변경사항</span>
+                                    <span className="sm:hidden">저장되지 않은 변경사항</span>
+                                </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            <div className="flex items-center gap-2">
                                 {isEditMode && (
                                     <Button
                                         variant="outline"
                                         onClick={() => setShowDeleteDialog(true)}
                                         disabled={isSaving || isDeleting}
-                                        className="gap-2 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground bg-transparent"
+                                        className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground bg-transparent px-3 sm:px-4"
                                     >
                                         <Trash2 className="h-4 w-4" />
-                                        삭제
+                                        <span className="hidden sm:inline ml-2">삭제</span>
                                     </Button>
                                 )}
                                 {(!isEditMode || isDraftMode) && (
@@ -556,19 +617,21 @@ function PostWriteContent() {
                                         variant="outline"
                                         onClick={() => handleSave(true)}
                                         disabled={isSaving || isDeleting}
-                                        className="gap-2 border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white bg-transparent"
+                                        className="border-amber-600 text-amber-600 hover:bg-amber-600 hover:text-white bg-transparent px-3 sm:px-4"
                                     >
                                         <Save className="h-4 w-4" />
-                                        {isSaving ? "저장 중..." : "임시저장"}
+                                        <span className="hidden sm:inline ml-2">{isSaving ? "저장 중..." : "임시저장"}</span>
                                     </Button>
                                 )}
                                 <Button
                                     onClick={() => handleSave(false)}
                                     disabled={isSaving || isDeleting}
-                                    className="gap-2 bg-foreground text-background hover:bg-foreground/90"
+                                    className="bg-foreground text-background hover:bg-foreground/90 px-3 sm:px-4"
                                 >
                                     <Upload className="h-4 w-4" />
-                                    {isSaving ? "저장 중..." : isDraftMode ? "출간하기" : isEditMode ? "수정 완료" : "출간하기"}
+                                    <span className="hidden sm:inline ml-2">
+                                        {isSaving ? "저장 중..." : isDraftMode ? "출간하기" : isEditMode ? "수정 완료" : "출간하기"}
+                                    </span>
                                 </Button>
                             </div>
                         </div>
