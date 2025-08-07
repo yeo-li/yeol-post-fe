@@ -231,7 +231,7 @@ export default function AllPostsPage() {
                       </span>
                         </div>
                       </div>
-                      <h3 className="font-semibold text-2xl group-hover:text-primary transition-colors line-clamp-2 min-h-[3rem]">
+                      <h3 className="text-xl md:text-2xl font-bold mb-4 transition-colors leading-tight line-clamp-2 min-h-[3.5rem] ">
                         {post.title}
                       </h3>
                     </CardHeader>
