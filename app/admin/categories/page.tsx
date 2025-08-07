@@ -10,21 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-    Plus,
-    Trash2,
-    Search,
-    FolderOpen,
-    Save,
-    Loader2,
-    Lock,
-    FileText,
-    Settings,
-    AlertCircle,
-    Edit,
-    Palette,
-    Pipette,
-} from "lucide-react"
+import { Plus, Trash2, Search, FolderOpen, Save, Loader2, Lock, FileText, Settings, AlertCircle, Edit, Palette, Pipette, ArrowRight } from 'lucide-react'
 import {
     fetchLoginInformation,
     fetchCategoriesAndPostsCount,
@@ -151,179 +137,190 @@ function CategoryForm({
     )
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 gap-4">
-                <div>
-                    <label className="block text-sm font-medium mb-2">카테고리 이름 *</label>
-                    <Input
-                        value={formData.category_name}
-                        onChange={(e) => setFormData({ ...formData, category_name: e.target.value })}
-                        placeholder="카테고리 이름을 입력하세요"
-                        maxLength={20}
-                        required
-                        disabled={isLoading}
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">{formData.category_name.length}/20자</p>
-                </div>
-            </div>
-
-            <div>
-                <label className="block text-sm font-medium mb-2">설명</label>
-                <Textarea
-                    value={formData.category_description}
-                    onChange={(e) => setFormData({ ...formData, category_description: e.target.value })}
-                    placeholder="카테고리에 대한 설명을 입력하세요"
-                    rows={3}
-                    disabled={isLoading}
-                />
-            </div>
-
-            <div>
-                <label className="block text-sm font-medium mb-4">색상</label>
-
-                {/* 색상 미리보기 */}
-                <div className="flex items-center gap-3 mb-4 p-3 border rounded-lg bg-muted/20">
-                    <div
-                        className="w-8 h-8 rounded-full border-2 border-white shadow-md"
-                        style={{ backgroundColor: formData.category_color }}
-                    ></div>
+        <div className="p-1">
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 gap-4">
                     <div>
-                        <p className="font-medium">선택된 색상</p>
-                        <p className="text-sm text-muted-foreground">{formData.category_color}</p>
+                        <label className="block text-sm font-medium mb-2">카테고리 이름 *</label>
+                        <Input
+                            value={formData.category_name}
+                            onChange={(e) => setFormData({ ...formData, category_name: e.target.value })}
+                            placeholder="카테고리 이름을 입력하세요"
+                            maxLength={20}
+                            required
+                            disabled={isLoading}
+                            className="border-gray-200 focus:border-gray-400 focus:ring-0"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">{formData.category_name.length}/20자</p>
                     </div>
                 </div>
 
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="preset" className="gap-2">
-                            <Palette className="h-4 w-4" />
-                            프리셋 색상
-                        </TabsTrigger>
-                        <TabsTrigger value="custom" className="gap-2">
-                            <Pipette className="h-4 w-4" />
-                            커스텀 색상
-                        </TabsTrigger>
-                    </TabsList>
+                <div>
+                    <label className="block text-sm font-medium mb-2">설명</label>
+                    <Textarea
+                        value={formData.category_description}
+                        onChange={(e) => setFormData({ ...formData, category_description: e.target.value })}
+                        placeholder="카테고리에 대한 설명을 입력하세요"
+                        rows={3}
+                        disabled={isLoading}
+                        className="border-gray-200 focus:border-gray-400 focus:ring-0 resize-none"
+                    />
+                </div>
 
-                    <TabsContent value="preset" className="space-y-4 mt-4">
-                        {Object.entries(colorGroups).map(([groupName, colors]) => (
-                            <div key={groupName}>
-                                <h4 className="text-sm font-medium mb-2 text-muted-foreground">{groupName}</h4>
-                                <div className="grid grid-cols-6 gap-2">
-                                    {colors.map((color) => (
-                                        <button
-                                            key={color.value}
-                                            type="button"
-                                            onClick={() => handlePresetColorSelect(color.value)}
-                                            className={`p-2 rounded-lg border-2 transition-all hover:scale-105 ${
-                                                formData.category_color === color.value
-                                                    ? "border-foreground shadow-md"
-                                                    : "border-muted hover:border-muted-foreground"
-                                            }`}
-                                            disabled={isLoading}
-                                            title={color.name}
-                                        >
-                                            <div
-                                                className="w-6 h-6 rounded-full mx-auto shadow-sm"
-                                                style={{ backgroundColor: color.value }}
-                                            ></div>
-                                            <span className="text-xs mt-1 block truncate">{color.name}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
-                    </TabsContent>
+                <div>
+                    <label className="block text-sm font-medium mb-4">색상</label>
 
-                    <TabsContent value="custom" className="space-y-4 mt-4">
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium mb-2">색상 선택기</label>
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="color"
-                                        value={customColor}
-                                        onChange={(e) => handleCustomColorChange(e.target.value)}
-                                        className="w-16 h-10 rounded border cursor-pointer"
-                                        disabled={isLoading}
-                                    />
-                                    <Input
-                                        value={customColor}
-                                        onChange={(e) => handleCustomColorChange(e.target.value)}
-                                        placeholder="#000000"
-                                        pattern="^#[0-9A-Fa-f]{6}$"
-                                        className="flex-1"
-                                        disabled={isLoading}
-                                    />
-                                </div>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    HEX 색상 코드를 입력하거나 색상 선택기를 사용하세요
-                                </p>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium mb-2">빠른 색상</label>
-                                <div className="grid grid-cols-8 gap-2">
-                                    {[
-                                        "#FF6B6B",
-                                        "#4ECDC4",
-                                        "#45B7D1",
-                                        "#96CEB4",
-                                        "#FFEAA7",
-                                        "#DDA0DD",
-                                        "#98D8C8",
-                                        "#F7DC6F",
-                                        "#BB8FCE",
-                                        "#85C1E9",
-                                        "#F8C471",
-                                        "#82E0AA",
-                                        "#F1948A",
-                                        "#85929E",
-                                        "#D7BDE2",
-                                        "#A9DFBF",
-                                    ].map((color) => (
-                                        <button
-                                            key={color}
-                                            type="button"
-                                            onClick={() => handleCustomColorChange(color)}
-                                            className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${
-                                                customColor === color ? "border-foreground" : "border-muted"
-                                            }`}
-                                            style={{ backgroundColor: color }}
-                                            disabled={isLoading}
-                                            title={color}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
+                    {/* 색상 미리보기 */}
+                    <div className="flex items-center gap-3 mb-4 p-3 border border-gray-200 rounded-lg bg-gray-50/50">
+                        <div
+                            className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
+                            style={{ backgroundColor: formData.category_color }}
+                        ></div>
+                        <div>
+                            <p className="font-medium text-sm">선택된 색상</p>
+                            <p className="text-xs text-muted-foreground">{formData.category_color}</p>
                         </div>
-                    </TabsContent>
-                </Tabs>
-            </div>
+                    </div>
 
-            <div className="flex gap-2 pt-4">
-                <Button
-                    type="submit"
-                    className="gap-2 bg-foreground text-background hover:bg-foreground/90"
-                    disabled={isLoading}
-                >
-                    {isLoading ? (
-                        <>
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            {isEdit ? "수정 중..." : "저장 중..."}
-                        </>
-                    ) : (
-                        <>
-                            <Save className="h-4 w-4" />
-                            {isEdit ? "수정" : "저장"}
-                        </>
-                    )}
-                </Button>
-                <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
-                    취소
-                </Button>
-            </div>
-        </form>
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                        <TabsList className="grid w-full grid-cols-2 bg-gray-100">
+                            <TabsTrigger value="preset" className="gap-2 text-sm">
+                                <Palette className="h-4 w-4" />
+                                <span className="hidden sm:inline">프리셋 색상</span>
+                                <span className="sm:hidden">프리셋</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="custom" className="gap-2 text-sm">
+                                <Pipette className="h-4 w-4" />
+                                <span className="hidden sm:inline">커스텀 색상</span>
+                                <span className="sm:hidden">커스텀</span>
+                            </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="preset" className="space-y-4 mt-4">
+                            {Object.entries(colorGroups).map(([groupName, colors]) => (
+                                <div key={groupName}>
+                                    <h4 className="text-sm font-medium mb-2 text-muted-foreground">{groupName}</h4>
+                                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                                        {colors.map((color) => (
+                                            <button
+                                                key={color.value}
+                                                type="button"
+                                                onClick={() => handlePresetColorSelect(color.value)}
+                                                className={`p-2 rounded-lg border-2 transition-all hover:scale-105 ${
+                                                    formData.category_color === color.value
+                                                        ? "border-gray-800 shadow-md"
+                                                        : "border-gray-200 hover:border-gray-400"
+                                                }`}
+                                                disabled={isLoading}
+                                                title={color.name}
+                                            >
+                                                <div
+                                                    className="w-6 h-6 rounded-full mx-auto shadow-sm"
+                                                    style={{ backgroundColor: color.value }}
+                                                ></div>
+                                                <span className="text-xs mt-1 block truncate">{color.name}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </TabsContent>
+
+                        <TabsContent value="custom" className="space-y-4 mt-4">
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">색상 선택기</label>
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            type="color"
+                                            value={customColor}
+                                            onChange={(e) => handleCustomColorChange(e.target.value)}
+                                            className="w-16 h-10 rounded border border-gray-200 cursor-pointer"
+                                            disabled={isLoading}
+                                        />
+                                        <Input
+                                            value={customColor}
+                                            onChange={(e) => handleCustomColorChange(e.target.value)}
+                                            placeholder="#000000"
+                                            pattern="^#[0-9A-Fa-f]{6}$"
+                                            className="flex-1 border-gray-200 focus:border-gray-400 focus:ring-0"
+                                            disabled={isLoading}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        HEX 색상 코드를 입력하거나 색상 선택기를 사용하세요
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">빠른 색상</label>
+                                    <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
+                                        {[
+                                            "#FF6B6B",
+                                            "#4ECDC4",
+                                            "#45B7D1",
+                                            "#96CEB4",
+                                            "#FFEAA7",
+                                            "#DDA0DD",
+                                            "#98D8C8",
+                                            "#F7DC6F",
+                                            "#BB8FCE",
+                                            "#85C1E9",
+                                            "#F8C471",
+                                            "#82E0AA",
+                                            "#F1948A",
+                                            "#85929E",
+                                            "#D7BDE2",
+                                            "#A9DFBF",
+                                        ].map((color) => (
+                                            <button
+                                                key={color}
+                                                type="button"
+                                                onClick={() => handleCustomColorChange(color)}
+                                                className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${
+                                                    customColor === color ? "border-gray-800" : "border-gray-200"
+                                                }`}
+                                                style={{ backgroundColor: color }}
+                                                disabled={isLoading}
+                                                title={color}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </TabsContent>
+                    </Tabs>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="flex items-center justify-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                {isEdit ? "수정 중..." : "저장 중..."}
+                            </>
+                        ) : (
+                            <>
+                                <Save className="h-4 w-4" />
+                                {isEdit ? "수정" : "저장"}
+                            </>
+                        )}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        disabled={isLoading}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        취소
+                    </button>
+                </div>
+            </form>
+        </div>
     )
 }
 
@@ -403,19 +400,18 @@ export default function AdminCategoriesPage() {
                     <h1 className="text-2xl font-bold mb-4">로그인이 필요합니다</h1>
                     <p className="text-muted-foreground mb-6">관리자 페이지에 접근하려면 로그인해주세요.</p>
                     <div className="space-y-3">
-                        <Button
+                        <button
                             onClick={() => router.push("/")}
-                            className="w-full bg-foreground text-background hover:bg-foreground/90"
+                            className="w-full px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
                         >
                             홈으로 돌아가기
-                        </Button>
-                        <Button
-                            variant="outline"
+                        </button>
+                        <button
                             onClick={() => window.location.reload()}
-                            className="w-full border-foreground text-foreground hover:bg-foreground hover:text-background bg-transparent"
+                            className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                         >
                             다시 시도
-                        </Button>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -503,10 +499,10 @@ export default function AdminCategoriesPage() {
         <div className="min-h-screen bg-background">
             <div className="flex flex-col lg:flex-row">
                 {/* Sidebar */}
-                <div className="w-full lg:w-64 border-b lg:border-r lg:border-b-0 bg-muted/10 p-4 md:p-6">
+                <div className="w-full lg:w-64 border-b lg:border-r lg:border-b-0 bg-gray-50/50 p-4 md:p-6">
                     <div className="mb-6 md:mb-8">
                         <div className="flex items-center gap-2 mb-2">
-                            <div className="w-5 h-5 md:w-6 md:h-6 bg-foreground rounded-full"></div>
+                            <div className="w-5 h-5 md:w-6 md:h-6 bg-black rounded-full"></div>
                             <span className="font-semibold text-sm md:text-base">{userInfo?.nickname || "관리자"}</span>
                         </div>
                         <p className="text-xs md:text-sm text-muted-foreground">관리자</p>
@@ -514,19 +510,18 @@ export default function AdminCategoriesPage() {
 
                     <nav className="space-y-2">
                         {sidebarItems.map((item) => (
-                            <Button
+                            <button
                                 key={item.label}
-                                variant={item.active ? "default" : "ghost"}
-                                className={`w-full justify-start gap-2 ${
-                                    item.active
-                                        ? "bg-foreground text-background hover:bg-foreground/90"
-                                        : "text-foreground hover:bg-muted"
-                                }`}
                                 onClick={() => router.push(item.href)}
+                                className={`w-full flex items-center justify-start gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
+                                    item.active
+                                        ? "bg-black text-white"
+                                        : "text-gray-700 hover:bg-gray-100"
+                                }`}
                             >
                                 <item.icon className="h-4 w-4" />
                                 {item.label}
-                            </Button>
+                            </button>
                         ))}
                     </nav>
                 </div>
@@ -558,17 +553,18 @@ export default function AdminCategoriesPage() {
                                 placeholder="카테고리 검색..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10"
+                                className="pl-10 border-gray-200 focus:border-gray-400 focus:ring-0"
                             />
                         </div>
 
                         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                             <DialogTrigger asChild>
-                                <Button className="gap-2 bg-foreground text-background hover:bg-foreground/90">
-                                    <Plus className="h-4 w-4" />새 카테고리
-                                </Button>
+                                <button className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors">
+                                    <Plus className="h-4 w-4" />
+                                    새 카테고리
+                                </button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                            <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto">
                                 <DialogHeader>
                                     <DialogTitle>새 카테고리 만들기</DialogTitle>
                                 </DialogHeader>
@@ -584,104 +580,93 @@ export default function AdminCategoriesPage() {
                     {/* Categories Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                         {filteredCategories.map((category) => (
-                            <Card
+                            <div
                                 key={category.category_id}
-                                className="hover:shadow-lg transition-shadow border-l-4"
+                                className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow border-l-4"
                                 style={{ borderLeftColor: category.category_color }}
                             >
-                                <CardHeader>
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <div
-                                                className="w-4 h-4 rounded-full shadow-sm"
-                                                style={{ backgroundColor: category.category_color }}
-                                            ></div>
-                                            <CardTitle className="text-lg">{category.category_name}</CardTitle>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => openEditDialog(category)}
-                                                className="text-muted-foreground hover:text-foreground hover:bg-muted"
-                                                title="카테고리 수정"
-                                            >
-                                                <Edit className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDeleteCategory(category.category_id)}
-                                                className="text-destructive hover:text-destructive hover:bg-muted"
-                                                title="카테고리 삭제"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div
+                                            className="w-4 h-4 rounded-full shadow-sm"
+                                            style={{ backgroundColor: category.category_color }}
+                                        ></div>
+                                        <h3 className="text-lg font-semibold">{category.category_name}</h3>
                                     </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                                        {category.category_description || "설명이 없습니다."}
-                                    </p>
-                                    <div className="flex items-center justify-between text-sm">
-                                        <div className="flex items-center gap-4">
-                      <span className="text-muted-foreground">
-                        색상: <code className="bg-muted px-1 rounded text-xs">{category.category_color}</code>
-                      </span>
-                                        </div>
-                                        <Badge
-                                            variant="outline"
-                                            style={{ borderColor: category.category_color, color: category.category_color }}
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => openEditDialog(category)}
+                                            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                                            title="카테고리 수정"
                                         >
-                                            {category.post_count}개 글
-                                        </Badge>
+                                            <Edit className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteCategory(category.category_id)}
+                                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                                            title="카테고리 삭제"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </div>
+
+                                <p className="text-sm text-gray-600 mb-4 line-clamp-2 break-words">
+                                    {category.category_description || "설명이 없습니다."}
+                                </p>
+
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-500">
+                                        색상: <code className="bg-gray-100 px-1 rounded text-xs">{category.category_color}</code>
+                                    </span>
+                                    <span
+                                        className="px-2 py-1 rounded-full text-xs border"
+                                        style={{ borderColor: category.category_color, color: category.category_color }}
+                                    >
+                                        {category.post_count}개 글
+                                    </span>
+                                </div>
+                            </div>
                         ))}
                     </div>
 
                     {/* Empty State */}
                     {filteredCategories.length === 0 && !loading && (
                         <div className="text-center py-12">
-                            <FolderOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                            <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                             <h3 className="text-lg font-semibold mb-2">카테고리가 없습니다</h3>
-                            <p className="text-muted-foreground mb-4">
+                            <p className="text-gray-600 mb-4">
                                 {searchQuery ? "검색 결과가 없습니다." : "첫 번째 카테고리를 만들어보세요."}
                             </p>
                             {!searchQuery && (
-                                <Button
+                                <button
                                     onClick={() => setIsCreateDialogOpen(true)}
-                                    className="gap-2 bg-foreground text-background hover:bg-foreground/90"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
                                 >
-                                    <Plus className="h-4 w-4" />새 카테고리 만들기
-                                </Button>
+                                    <Plus className="h-4 w-4" />
+                                    새 카테고리 만들기
+                                </button>
                             )}
                         </div>
                     )}
 
                     {/* Stats */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <Card>
-                            <CardContent className="p-4 text-center">
-                                <div className="text-2xl font-bold">{categories.length}</div>
-                                <div className="text-sm text-muted-foreground">총 카테고리</div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardContent className="p-4 text-center">
-                                <div className="text-2xl font-bold">{categories.reduce((sum, cat) => sum + cat.post_count, 0)}</div>
-                                <div className="text-sm text-muted-foreground">총 포스트</div>
-                            </CardContent>
-                        </Card>
+                        <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                            <div className="text-2xl font-bold">{categories.length}</div>
+                            <div className="text-sm text-gray-600">총 카테고리</div>
+                        </div>
+                        <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                            <div className="text-2xl font-bold">{categories.reduce((sum, cat) => sum + cat.post_count, 0)}</div>
+                            <div className="text-sm text-gray-600">총 포스트</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* Edit Category Dialog */}
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>카테고리 수정</DialogTitle>
                     </DialogHeader>

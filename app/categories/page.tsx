@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowRight, Calendar } from "lucide-react"
+import { ArrowRight, Calendar } from 'lucide-react'
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { fetchCategoriesAndPostsCount } from "@/lib/api"
@@ -13,7 +13,7 @@ const getCategoryColorClasses = (categoryColor: string) => {
   const colorMap: { [key: string]: { dot: string; badge: string; hover: string } } = {
     "#3B82F6": {
       dot: "bg-blue-500",
-      badge: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 ㅁdark:border-blue-800",
+      badge: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800",
       hover: "group-hover:bg-blue-50 dark:group-hover:bg-blue-950/50",
     },
     "#8B5CF6": {
@@ -90,82 +90,85 @@ export default function CategoriesPage() {
   }, [])
 
   return (
-      <div className="container px-4 md:px-6 lg:px-8 py-6 md:py-8 lg:py-12 max-w-7xl mx-auto">
+      <div className="container px-4 md:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8 md:mb-12 lg:mb-16">
+          <div className="text-center mb-12">
             <p className="text-sm text-muted-foreground mb-2">Categories</p>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">카테고리</h1>
-            <p className="text-sm md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <h1 className="text-4xl font-bold mb-6">카테고리</h1>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               관심 있는 주제별로 글들을 모아서 확인해보세요. 각 카테고리마다 다양한 내용의 글이 준비되어 있습니다.
             </p>
           </div>
 
-          {/* Categories Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 md:mb-20 lg:mb-24">
+          {/* Categories List */}
+          <div className="space-y-8 mb-16">
             {categories.filter(cat => cat.post_count > 0).map((category) => {
               const colorClasses = getCategoryColorClasses(category.category_color)
               return (
-                  <Card
+                  <article
                       key={category.category_name}
-                      className={`group hover:shadow-lg transition-all h-full flex flex-col border-l-4 ${colorClasses.hover}`}
-                      style={{ borderLeftColor: category.category_color }}
+                      className="group border-b border-border py-8 hover:bg-muted/30 transition-colors rounded-lg px-6"
                   >
-                    <CardHeader className="flex-shrink-0">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                      {/* Category Info */}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
                           <div
-                              className="w-4 h-4 rounded-full shadow-sm"
+                              className="w-3 h-3 rounded-full shadow-sm"
                               style={{ backgroundColor: category.category_color }}
                           ></div>
-                          <CardTitle className="text-xl">{category.category_name}</CardTitle>
+                          <h2 className="text-2xl font-bold group-hover:text-primary transition-colors">
+                            {category.category_name}
+                          </h2>
+                          <Badge variant="outline" className={colorClasses.badge}>
+                            {category.post_count}개 글
+                          </Badge>
                         </div>
-                        <Badge variant="outline" className={colorClasses.badge}>
-                          {category.post_count}개 글
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">
-                        {category.category_description || "이 카테고리에 대한 설명이 없습니다."}
-                      </p>
-                    </CardHeader>
-                    <CardContent className="flex-1 flex flex-col justify-between pt-0">
-                      <div className="flex-grow">
-                          {category.latest_post && (
-                              <div
-                                  className="bg-muted/50 rounded-lg p-3 border"
-                                  style={{ borderColor: `${category.category_color}20` }}
-                              >
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-                                  <Calendar className="h-3 w-3" />
-                                  <span>최신 글</span>
-                                </div>
-                                <p className="font-medium text-sm line-clamp-2">{category.latest_post.title}</p>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {category.latest_post.published_at?.split("T")[0]}
-                                </p>
+
+                        <p className="text-muted-foreground mb-4 leading-relaxed">
+                          {category.category_description || "이 카테고리에 대한 설명이 없습니다."}
+                        </p>
+
+                        {/* Latest Post */}
+                        {category.latest_post && (
+                            <div className="bg-muted/50 rounded-lg p-4 border-l-4" style={{ borderLeftColor: category.category_color }}>
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                                <Calendar className="h-4 w-4" />
+                                <span>최신 글</span>
+                                <span>•</span>
+                                <span>{category.latest_post.published_at?.split("T")[0]}</span>
                               </div>
-                          )}
+                              <p className="font-medium text-foreground">
+                                {category.latest_post.title}
+                              </p>
+                            </div>
+                        )}
                       </div>
-                      <Button
-                          variant="ghost"
-                          className="w-full justify-between group-hover:bg-primary group-hover:text-primary-foreground transition-colors mt-4"
-                          asChild
-                      >
-                        <Link href={`/categories/${category.category_name.replace("/", "-")}`}>
-                          <span>모든 {category.category_name} 글 보기</span>
-                          <ArrowRight className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
+
+                      {/* Action Button */}
+                      <div className="lg:ml-6">
+                        <Button
+                            variant="outline"
+                            className="group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors"
+                            asChild
+                        >
+                          <Link href={`/categories/${category.category_name.replace("/", "-")}`}>
+                            <span>모든 글 보기</span>
+                            <ArrowRight className="h-4 w-4 ml-2" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </div>
+                  </article>
               )
             })}
           </div>
 
           {/* All Posts CTA */}
-          <div className="bg-muted/50 rounded-lg p-6 md:p-8 lg:p-12 text-center mt-12">
-            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-3 md:mb-4">모든 글 보기</h2>
-            <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6 max-w-2xl mx-auto">
+          <div className="bg-muted/50 rounded-lg p-8 text-center">
+            <h2 className="text-2xl font-bold mb-4">모든 글 보기</h2>
+            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
               카테고리에 상관없이 모든 블로그 포스트를 시간순으로 확인하고 싶으시나요?
             </p>
             <Link href="/posts">

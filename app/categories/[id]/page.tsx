@@ -3,43 +3,43 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, BookOpen, Calendar, Clock } from "lucide-react"
+import { ArrowLeft, BookOpen, Calendar, Clock, Heart } from 'lucide-react'
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
 interface Post {
-  postId: number
-  title: string
-  summary: string
-  content: string
-  published_at: string
-  category: {
-    category_name: string
-  }
-  tags: string[]
+    postId: number
+    title: string
+    summary: string
+    content: string
+    published_at: string
+    category: {
+        category_name: string
+    }
+    tags: string[]
 }
 
 // 날짜 포맷팅 함수
 function formatDate(dateString: string): string {
-  try {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("ko-KR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  } catch {
-    return dateString
-  }
+    try {
+        const date = new Date(dateString)
+        return date.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        })
+    } catch {
+        return dateString
+    }
 }
 
 // 읽기 시간 계산 함수 (대략적으로 계산)
 function calculateReadTime(content: string): string {
-  const wordsPerMinute = 200
-  const wordCount = content.length / 2 // 한글 기준 대략적 계산
-  const readTime = Math.ceil(wordCount / wordsPerMinute)
-  return `${readTime}분`
+    const wordsPerMinute = 200
+    const wordCount = content.length / 2 // 한글 기준 대략적 계산
+    const readTime = Math.ceil(wordCount / wordsPerMinute)
+    return `${readTime}분`
 }
 
 // Summary 처리 함수
@@ -155,40 +155,40 @@ export default function DynamicCategoryPage() {
     const colorClasses = currentCategory ? getCategoryColorClasses(currentCategory.category_color) : null
 
     return (
-        <div className="min-h-screen bg-background">
-            <div className="container px-4 md:px-6 lg:px-8 py-8 md:py-12 max-w-7xl mx-auto">
+        <div className="min-h-screen bg-background overflow-x-hidden">
+            <div className="container px-4 md:px-6 lg:px-8 py-8 md:py-12 max-w-7xl mx-auto overflow-hidden">
                 {/* Header */}
-                <div className="mb-12">
+                <div className="mb-12 overflow-hidden">
                     <Link
                         href="/categories"
                         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors"
                     >
-                        <ArrowLeft className="h-4 w-4" />
+                        <ArrowLeft className="h-4 w-4 flex-shrink-0" />
                         카테고리로 돌아가기
                     </Link>
 
                     <div className="text-center max-w-3xl mx-auto">
-                        <div className="flex items-center justify-center gap-3 mb-4">
+                        <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
                             {currentCategory && (
                                 <>
                                     <div
-                                        className="w-3 h-3 rounded-full"
+                                        className="w-3 h-3 rounded-full flex-shrink-0"
                                         style={{ backgroundColor: currentCategory.category_color }}
                                     ></div>
-                                    <Badge variant="secondary" className="text-sm">
+                                    <Badge variant="secondary" className={`text-sm ${colorClasses?.badge || "bg-gray-50 text-gray-700"}`}>
                                         {categoryName}
                                     </Badge>
                                 </>
                             )}
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-bold mb-4">{categoryName}</h1>
-                        <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                        <h1 className="text-4xl md:text-5xl font-bold mb-4 break-words overflow-wrap-anywhere">{categoryName}</h1>
+                        <p className="text-lg text-muted-foreground mb-6 leading-relaxed break-words overflow-wrap-anywhere">
                             {currentCategory?.category_description || `${categoryName} 카테고리의 다양한 글들을 확인해보세요.`}
                         </p>
-                        <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+                        <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground flex-wrap">
                             <div className="flex items-center gap-2">
-                                <BookOpen className="h-4 w-4" />
-                                <span>{posts.length}개 글</span>
+                                <BookOpen className="h-4 w-4 flex-shrink-0" />
+                                <span className="whitespace-nowrap">{posts.length}개 글</span>
                             </div>
                         </div>
                     </div>
@@ -196,7 +196,7 @@ export default function DynamicCategoryPage() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
                     {/* Posts */}
-                    <div className="lg:col-span-3">
+                    <div className="lg:col-span-3 overflow-hidden">
                         {posts.length === 0 ? (
                             <div className="text-center py-16">
                                 <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -209,91 +209,111 @@ export default function DynamicCategoryPage() {
                                 </Link>
                             </div>
                         ) : (
-                            <div className="space-y-4">
-                                {posts.map((post) => (
-                                    <Link key={post.postId} href={`/posts/${post.postId}`} className="block">
-                                        <Card className="group hover:shadow-lg transition-all duration-300 border shadow-sm hover:shadow-xl h-full flex flex-col">
-                                            <CardContent className="p-6 md:p-8 flex flex-col flex-grow">
-                                                <div className="flex-grow">
-                                                    <div className="flex items-start justify-between mb-4">
-                                                        <Badge variant="secondary" className={colorClasses?.badge || "bg-gray-50 text-gray-700"}>
-                                                            {categoryName}
-                                                        </Badge>
-                                                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 gap-4">
-                                                            <span className="flex items-center gap-1">
-                                                              <Calendar className="h-3 w-3" />
-                                                                {post.published_at?.split("T")[0]}
-                                                            </span>
-                                                            <span className="flex items-center gap-1">
-                                                              <Clock className="h-3 w-3" />
-                                                                {calculateReadTime(post.content)}
-                                                            </span>
-                                                        </div>
-                                                    </div>
+                            <div className="max-w-4xl mx-auto overflow-hidden">
+                                {/*<div className="mb-8">*/}
+                                {/*    <h2 className="text-2xl md:text-3xl font-bold mb-2">{categoryName} Posts</h2>*/}
+                                {/*    <p className="text-muted-foreground break-words overflow-wrap-anywhere">*/}
+                                {/*        {currentCategory?.category_description || `${categoryName} 카테고리의 다양한 글들을 확인해보세요.`}*/}
+                                {/*    </p>*/}
+                                {/*</div>*/}
 
-                                                    <h2
-                                                        className={`text-xl md:text-2xl font-bold mb-4 transition-colors leading-tight line-clamp-2 min-h-[3.5rem] ${
-                                                            colorClasses?.hover || "group-hover:text-primary"
-                                                        }`}
-                                                    >
+                                <div className="space-y-12 overflow-hidden">
+                                    {posts.map((post, index) => (
+                                        <div key={post.postId} className="w-full overflow-hidden">
+                                            <Link href={`/posts/${post.postId}`} className="group block">
+                                                <article className="py-6 overflow-hidden">
+                                                    <h2 className={`text-2xl md:text-3xl font-bold mb-4 transition-colors leading-tight break-words overflow-wrap-anywhere ${
+                                                        colorClasses?.hover || "group-hover:text-primary"
+                                                    }`}>
                                                         {post.title}
                                                     </h2>
 
-                                                    <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-3">
-                                                        {getDisplaySummary(post.summary, post.content, 150)}
+                                                    <p className="text-muted-foreground mb-6 leading-relaxed text-base md:text-lg break-words overflow-wrap-anywhere">
+                                                        {getDisplaySummary(post.summary, post.content, 200)}
                                                     </p>
-                                                </div>
 
-                                                <div className="flex flex-wrap gap-2 mt-auto">
-                                                    {post.tags?.map((tag: string) => (
-                                                        <Badge key={tag} variant="outline" className="text-xs hover:bg-muted transition-colors">
-                                                            #{tag}
+                                                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4 flex-wrap">
+                                                        <span className="flex items-center gap-1 whitespace-nowrap">
+                                                            <Calendar className="h-3 w-3 flex-shrink-0" />
+                                                            {formatDate(post.published_at)}
+                                                        </span>
+                                                        <span className="flex items-center gap-1 whitespace-nowrap">
+                                                            <Clock className="h-3 w-3 flex-shrink-0" />
+                                                            {calculateReadTime(post.content)}
+                                                        </span>
+                                                        <Badge variant="secondary" className={`text-xs ${colorClasses?.badge || "bg-gray-50 text-gray-700"}`}>
+                                                            {categoryName}
                                                         </Badge>
-                                                    ))}
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </Link>
-                                ))}
+                                                        <span className="flex items-center gap-1 whitespace-nowrap">
+                                                            <Heart className="h-3 w-3 flex-shrink-0" />
+                                                            0
+                                                        </span>
+                                                    </div>
+
+                                                    {post.tags && post.tags.length > 0 && (
+                                                        <div className="flex flex-wrap gap-2 overflow-hidden">
+                                                            {post.tags.slice(0, 5).map((tag: string) => (
+                                                                <Badge
+                                                                    key={tag}
+                                                                    variant="outline"
+                                                                    className="text-xs hover:bg-muted transition-colors max-w-full overflow-hidden text-ellipsis whitespace-nowrap"
+                                                                >
+                                                                    #{tag}
+                                                                </Badge>
+                                                            ))}
+                                                            {post.tags.length > 5 && (
+                                                                <Badge variant="outline" className="text-xs">
+                                                                    +{post.tags.length - 5}
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </article>
+                                            </Link>
+                                            {index < posts.length - 1 && <hr className="border-border" />}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
 
                     {/* Sidebar */}
-                    <div className="lg:col-span-1">
+                    <div className="lg:col-span-1 overflow-hidden">
                         <div className="sticky top-8">
-                            <Card className="border shadow-sm">
-                                <CardHeader className="pb-4">
+                            <div className="space-y-4">
+                                <div className="pb-2 border-b">
                                     <h3 className="font-semibold text-lg">다른 카테고리</h3>
-                                    <p className="text-sm text-muted-foreground">다양한 주제의 글들을 둘러보세요</p>
-                                </CardHeader>
-                                <CardContent className="space-y-3">
+                                    <p className="text-sm text-muted-foreground mt-1">다양한 주제의 글들을 둘러보세요</p>
+                                </div>
+
+                                <div className="space-y-2">
                                     {otherCategories.filter(cat => cat.post_count > 0).map((category) => (
                                         <Link key={category.category_name} href={`/categories/${category.category_name.replace("/", "-")}`}>
-                                            <div className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer group my-2">
-                                                <div className="flex items-center gap-3">
+                                            <div className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-muted/50 transition-colors cursor-pointer group">
+                                                <div className="flex items-center gap-3 min-w-0 flex-1">
                                                     <div
-                                                        className="w-3 h-3 rounded-full"
+                                                        className="w-2 h-2 rounded-full flex-shrink-0"
                                                         style={{ backgroundColor: category.category_color }}
                                                     ></div>
-                                                    <span className="font-medium group-hover:text-foreground">{category.category_name}</span>
+                                                    <span className="text-sm font-medium group-hover:text-foreground truncate">{category.category_name}</span>
                                                 </div>
-                                                <Badge variant="secondary" className="text-xs">
+                                                <span className="text-xs text-muted-foreground flex-shrink-0 ml-2">
                                                     {category.post_count}개
-                                                </Badge>
+                                                </span>
                                             </div>
                                         </Link>
                                     ))}
+                                </div>
 
-                                    <div className="pt-4 border-t">
-                                        <Link href="/categories">
-                                            <Button variant="outline" className="w-full bg-transparent">
-                                                모든 카테고리 보기
-                                            </Button>
-                                        </Link>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                <div className="pt-4 border-t">
+                                    <Link href="/categories">
+                                        <button className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors text-left">
+                                            모든 카테고리 보기 →
+                                        </button>
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

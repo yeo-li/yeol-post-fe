@@ -2,37 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, ArrowRight } from "lucide-react"
+import { Calendar, Heart, MessageCircle, ArrowRight } from 'lucide-react'
 import Link from "next/link"
 import { NewsletterForm } from "@/components/newsletter-form"
 import { getRecentPosts } from "@/lib/data"
 
-// 날짜 포맷팅 함수
-function formatDate(dateString: string): string {
-  try {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("ko-KR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  } catch {
-    return dateString
-  }
-}
-
-// 읽기 시간 계산 함수 (대략적으로 계산)
-function calculateReadTime(content: string): string {
-  const wordsPerMinute = 200
-  const wordCount = content.length / 2 // 한글 기준 대략적 계산
-  const readTime = Math.ceil(wordCount / wordsPerMinute)
-  return `${readTime}분`
-}
-
 // Summary 처리 함수
-function getDisplaySummary(summary: string, content = "", maxLength = 120): string {
+function getDisplaySummary(summary: string, content = "", maxLength = 150): string {
   // summary가 있고 비어있지 않은 경우
   if (summary && summary.trim()) {
     return summary.length > maxLength ? summary.substring(0, maxLength) + "..." : summary
@@ -63,7 +40,7 @@ export default function HomePage() {
     }
     const fetchAdminName = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admins/me`, {
+        const res = await fetch("http://localhost:8080/api/v1/admins/me", {
           credentials: "include",
         })
         const data = await res.json()
@@ -85,17 +62,18 @@ export default function HomePage() {
   }
 
   return (
-      <div className="min-h-screen">
+      <div className="min-h-screen overflow-x-hidden">
         {/* Hero Section */}
         <section className="py-12 md:py-20 lg:py-32">
-          <div className="container px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div className="container px-4 md:px-6 lg:px-8 max-w-4xl mx-auto">
             <div className="max-w-4xl mx-auto">
               <p className="text-sm text-muted-foreground mb-4">Welcome to my blog</p>
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight">
-                {adminMessage ?? "안녕하세요, 박성열입니다."}
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight break-words">
+                {adminMessage ?? "안녕하세요, 서여입니다."}
               </h1>
-              <p className="text-base md:text-lg text-muted-foreground mb-6 md:mb-8 leading-relaxed max-w-3xl">
-                아키텍트가 되고 싶은 백엔드 개발자 지망생입니다. 더 견고한 웹을 만들기 위해 노력하고 있습니다.
+              <p className="text-base md:text-lg text-muted-foreground mb-6 md:mb-8 leading-relaxed max-w-3xl break-words">
+                아키텍트가 되고 싶은 백엔드 개발자 지망생입니다.
+                더 견고한 웹을 만들기 위해 노력하고 있습니다.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                 <Link href="/about">
@@ -103,13 +81,13 @@ export default function HomePage() {
                     더 자세히 알아보기 <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/categories">
+                <Link href="/posts">
                   <Button
                       variant="outline"
                       size="lg"
                       className="border-foreground text-foreground hover:bg-foreground hover:text-background bg-transparent"
                   >
-                    카테고리 둘러보기
+                    모든 게시물 보기
                   </Button>
                 </Link>
               </div>
@@ -117,62 +95,89 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Recent Posts */}
+        {/* Recent Posts - Velog Style */}
         <section className="py-12 md:py-16 lg:py-20">
-          <div className="container px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 md:mb-8 gap-4">
+          <div className="container px-4 md:px-6 lg:px-8 max-w-4xl mx-auto">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-2">최근 글</h2>
-                <p className="text-sm md:text-base text-muted-foreground">
-                  새로 업데이트된 블로그 포스트들을 확인해보세요
+                <h2 className="text-3xl md:text-4xl font-bold mb-3 break-words">최근 글</h2>
+                <p className="text-base text-muted-foreground break-words">
+                  개발하면서 배운 것들을 정리하고 공유합니다
                 </p>
               </div>
-              <Link href="/posts">
-                <Button variant="ghost" className="gap-2 text-foreground hover:bg-muted">
-                  모든 글 보기 <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {recentPosts.map((post) => (
-                  <Link key={post.postId} href={`/posts/${post.postId}`} className="block">
-                    <Card className="group hover:shadow-lg transition-shadow h-[300px] flex flex-col">
-                      <CardHeader className="pb-3 flex-shrink-0">
-                        <div className="flex items-center justify-between mb-3">
-                          {post.category && <Badge variant="secondary">{post.category.category_name}</Badge>}
-                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 gap-4">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {formatDate(post.published_at)}
-                        </span>
-                            <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                              {calculateReadTime(post.content)}
-                        </span>
-                          </div>
-                        </div>
-                        {/*<h3 className="font-semibold text-2xl group-hover:text-primary transition-colors line-clamp-2 min-h-[3rem]">*/}
-                        <h3 className="text-xl md:text-2xl font-bold mb-4 transition-colors leading-tight line-clamp-2 min-h-[3.5rem] ">
+            {/* Posts List */}
+            <div className="space-y-12">
+              {recentPosts.map((post, index) => (
+                  <article key={post.postId} className="group">
+                    <Link href={`/posts/${post.postId}`} className="block">
+                      <div className="space-y-4 w-full overflow-hidden">
+                        <h3 className="text-2xl md:text-3xl font-bold text-foreground group-hover:text-primary transition-colors leading-tight break-words overflow-wrap-anywhere">
                           {post.title}
                         </h3>
-                      </CardHeader>
-                      <CardContent className="flex-1 flex flex-col justify-between">
-                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-grow leading-relaxed">
+
+                        <p className="text-base md:text-lg text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere">
                           {getDisplaySummary(post.summary, post.content)}
                         </p>
-                        <div className="flex flex-wrap gap-1 mt-auto">
-                          {post.tags?.map((tag: string) => (
-                              <Badge key={tag} variant="outline" className="text-xs">
-                                #{tag}
-                              </Badge>
-                          ))}
+
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                      <span className="flex items-center gap-1 break-words">
+                        <Calendar className="h-4 w-4 flex-shrink-0" />
+                        <span className="break-words">{post.published_at?.split("T")[0]}</span>
+                      </span>
+
+                          {post.category && (
+                              <span className="break-words overflow-hidden text-ellipsis">
+                          {post.category.category_name}
+                        </span>
+                          )}
+
+                          <span className="flex items-center gap-1">
+                        <Heart className="h-4 w-4 flex-shrink-0" />
+                        0
+                      </span>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
+
+                        {post.tags && post.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 w-full overflow-hidden">
+                              {post.tags.map((tag: string) => (
+                                  <Badge
+                                      key={tag}
+                                      variant="secondary"
+                                      className="text-xs px-2 py-1 bg-muted hover:bg-muted/80 break-words max-w-full overflow-hidden text-ellipsis whitespace-nowrap"
+                                  >
+                                    #{tag}
+                                  </Badge>
+                              ))}
+                            </div>
+                        )}
+                      </div>
+                    </Link>
+
+                    {/* Divider - except for last item */}
+                    {index < recentPosts.length - 1 && (
+                        <div className="mt-12 border-b border-border"></div>
+                    )}
+                  </article>
               ))}
             </div>
+
+            {/* More Posts Button */}
+            {recentPosts.length > 0 && (
+                <div className="text-center mt-16">
+                  <Link href="/posts">
+                    <Button
+                        variant="outline"
+                        size="lg"
+                        className="gap-2 border-foreground text-foreground hover:bg-foreground hover:text-background bg-transparent px-8"
+                    >
+                      더 많은 포스트 보기
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+            )}
           </div>
         </section>
 
@@ -180,12 +185,9 @@ export default function HomePage() {
         <section className="py-12 md:py-16 lg:py-20 bg-muted/50">
           <div className="container px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
             <div className="max-w-2xl mx-auto text-center">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">새 글 알림 받기</h2>
-              {/*<p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8">*/}
-              {/*  새로운 블로그 포스트가 올라올 때마다 이메일로 알림을 받아보세요*/}
-              {/*</p>*/}
-              <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8">
-                아직 기능이 구현되지 않았습니다. 조금만 기다려주세요!
+              <h2 className="text-2xl md:text-3xl font-bold mb-4 break-words">새 글 알림 받기</h2>
+              <p className="text-sm md:text-base text-muted-foreground mb-6 md:mb-8 break-words">
+                새로운 블로그 포스트가 올라올 때마다 이메일로 알림을 받아보세요
               </p>
               <NewsletterForm />
             </div>

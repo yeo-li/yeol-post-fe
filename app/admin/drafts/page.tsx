@@ -7,21 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Drawer, DrawerContent } from "@/components/ui/drawer"
-import {
-    Search,
-    Eye,
-    Edit,
-    Trash2,
-    Calendar,
-    Clock,
-    FileText,
-    FolderOpen,
-    Settings,
-    Loader2,
-    Lock,
-    Save,
-    Menu,
-} from "lucide-react"
+import { Search, Eye, Edit, Trash2, Calendar, Clock, FileText, FolderOpen, Settings, Loader2, Lock, Save, Menu } from 'lucide-react'
 import { deletePost, fetchLoginInformation, fetchAllDraftPosts } from "@/lib/api"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -282,54 +268,59 @@ export default function AdminDraftsPage() {
                     </div>
 
                     {/* Drafts List */}
-                    <div className="space-y-4">
+                    <div className="space-y-0">
                         {filteredPosts.length === 0 ? (
-                            <Card>
-                                <CardContent className="p-8 text-center">
-                                    <Save className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                                    <h3 className="text-lg font-semibold mb-2">
-                                        {searchQuery ? "검색 결과가 없습니다" : "임시저장된 글이 없습니다"}
-                                    </h3>
-                                    <p className="text-muted-foreground mb-4">
-                                        {searchQuery ? "다른 검색어로 시도해보세요." : "새로운 글을 작성해보세요!"}
-                                    </p>
-                                    {!searchQuery && (
-                                        <Link href="/admin/write">
-                                            <Button className="gap-2 bg-foreground text-background hover:bg-foreground/90">
-                                                <FileText className="h-4 w-4" />새 글 작성
-                                            </Button>
-                                        </Link>
-                                    )}
-                                </CardContent>
-                            </Card>
+                            <div className="text-center py-12">
+                                <Save className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                                <h3 className="text-lg font-semibold mb-2">
+                                    {searchQuery ? "검색 결과가 없습니다" : "임시저장된 글이 없습니다"}
+                                </h3>
+                                <p className="text-muted-foreground mb-4">
+                                    {searchQuery ? "다른 검색어로 시도해보세요." : "새로운 글을 작성해보세요!"}
+                                </p>
+                                {!searchQuery && (
+                                    <Link href="/admin/write">
+                                        <Button className="gap-2 bg-foreground text-background hover:bg-foreground/90">
+                                            <FileText className="h-4 w-4" />새 글 작성
+                                        </Button>
+                                    </Link>
+                                )}
+                            </div>
                         ) : (
                             filteredPosts.map((post) => (
-                                <Card key={post.postId} className="hover:shadow-md transition-shadow border-l-4 border-l-amber-500">
-                                    <CardContent className="p-4">
-                                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                                            <div className="flex-1 md:mb-0">
-                                                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                                    <Badge variant="outline" className="text-amber-600 border-amber-600">
-                                                        <Save className="h-3 w-3 mr-1" />
-                                                        임시저장
-                                                    </Badge>
-                                                    <Badge variant="secondary">{post.category.category_name}</Badge>
-                                                    <div className="flex items-center text-xs text-muted-foreground gap-4 flex-wrap">
-                                                        {/*<span className="flex items-center gap-1">*/}
-                                                        {/*  /!*<Calendar className="h-3 w-3" />*!/*/}
-                                                        {/*  /!*  {formatDate(post.published_at)}*!/*/}
-                                                        {/*</span>*/}
-                                                        <span className="flex items-center gap-1">
-                                                          <Clock className="h-3 w-3" />
-                                                            {calculateReadTime(post.content)}
-                                                        </span>
-                                                        <span className="text-muted-foreground">작성자: {post.author}</span>
-                                                    </div>
+                                <article
+                                    key={post.postId}
+                                    className="border-b py-8 hover:bg-muted/30 transition-colors"
+                                >
+                                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-3 flex-wrap">
+                                                <Badge variant="outline" className="text-amber-600 border-amber-600">
+                                                    <Save className="h-3 w-3 mr-1" />
+                                                    임시저장
+                                                </Badge>
+                                                <Badge variant="secondary">{post.category.category_name}</Badge>
+                                                <div className="flex items-center text-xs text-muted-foreground gap-4 flex-wrap">
+                                                    <span className="flex items-center gap-1">
+                                                        <Clock className="h-3 w-3" />
+                                                        {calculateReadTime(post.content)}
+                                                    </span>
+                                                    <span>작성자: {post.author}</span>
                                                 </div>
-                                                <h3 className="font-semibold mb-2 line-clamp-1">{post.title || "제목 없음"}</h3>
-                                                {post.summary && (
-                                                    <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{post.summary}</p>
-                                                )}
+                                            </div>
+
+                                            <h2 className="text-xl font-semibold mb-3 line-clamp-2 cursor-pointer hover:text-primary transition-colors"
+                                                onClick={() => handleEditDraft(post.postId)}>
+                                                {post.title || "제목 없음"}
+                                            </h2>
+
+                                            {post.summary && (
+                                                <p className="text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
+                                                    {post.summary}
+                                                </p>
+                                            )}
+
+                                            {post.tags && post.tags.length > 0 && (
                                                 <div className="flex flex-wrap gap-1">
                                                     {post.tags.map((tag, index) => (
                                                         <Badge key={index} variant="outline" className="text-xs">
@@ -337,45 +328,37 @@ export default function AdminDraftsPage() {
                                                         </Badge>
                                                     ))}
                                                 </div>
-                                            </div>
-                                            <div className="flex items-center gap-2 self-end md:self-auto md:ml-4">
-                                                {/*<Button*/}
-                                                {/*    variant="ghost"*/}
-                                                {/*    size="icon"*/}
-                                                {/*    className="hover:bg-muted"*/}
-                                                {/*    onClick={() => handleViewPost(post.postId)}*/}
-                                                {/*    title="미리보기"*/}
-                                                {/*>*/}
-                                                {/*    <Eye className="h-4 w-4" />*/}
-                                                {/*</Button>*/}
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="hover:bg-muted text-amber-600 hover:text-amber-700"
-                                                    onClick={() => handleEditDraft(post.postId)}
-                                                    title="계속 작성하기"
-                                                >
-                                                    <Edit className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="text-destructive hover:text-destructive hover:bg-muted"
-                                                    onClick={() => handleDeleteClick(post)}
-                                                    title="임시저장 글 삭제"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
+                                            )}
                                         </div>
-                                    </CardContent>
-                                </Card>
+
+                                        <div className="flex items-center gap-2 self-end md:self-start md:ml-4">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="hover:bg-muted text-amber-600 hover:text-amber-700"
+                                                onClick={() => handleEditDraft(post.postId)}
+                                                title="계속 작성하기"
+                                            >
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-destructive hover:text-destructive hover:bg-muted"
+                                                onClick={() => handleDeleteClick(post)}
+                                                title="임시저장 글 삭제"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </article>
                             ))
                         )}
                     </div>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mt-6 md:mt-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mt-8">
                         <Card>
                             <CardContent className="p-3 md:p-4 lg:p-6 text-center">
                                 <div className="text-xl md:text-2xl lg:text-3xl font-bold mb-1 text-amber-600">{posts.length}</div>
