@@ -233,13 +233,6 @@ export default function AllPostsPage() {
 
             {/* Posts Content - Centered */}
             <div className="w-full max-w-4xl overflow-hidden">
-              <div className="mb-8">
-                <h2 className="text-2xl md:text-3xl font-bold mb-2">Latest Posts</h2>
-                <p className="text-muted-foreground break-words overflow-wrap-anywhere">
-                  개발하면서 배운 것들을 정리하고 공유합니다
-                </p>
-              </div>
-
               <div className="space-y-8 overflow-hidden">
                 {currentPosts.map((post, index) => (
                     <div key={post.postId} className="w-full overflow-hidden">
