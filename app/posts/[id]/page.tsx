@@ -11,8 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowLeft, Calendar, Share2, ThumbsUp, MessageCircle, Edit, Eye, Heart, Send, Reply } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { fetchPost, fetchLoginInformation } from "@/lib/api"
-import { use, useEffect, useState } from "react"
+import {fetchPost, fetchLoginInformation, increasePostViews} from "@/lib/api"
+import { use, useEffect, useState, useRef } from "react" 
 import MDEditor from "@uiw/react-md-editor"
 
 // 댓글 타입 정의
@@ -71,11 +71,12 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: numbe
   // 상호작용 상태
   const [isLiked, setIsLiked] = useState(false)
   const [likeCount, setLikeCount] = useState(42)
-  const [viewCount, setViewCount] = useState(1234)
+  const [viewCount, setViewCount] = useState(0)
   const [comments, setComments] = useState<Comment[]>(mockComments)
   const [newComment, setNewComment] = useState("")
   const [replyingTo, setReplyingTo] = useState<number | null>(null)
   const [replyContent, setReplyContent] = useState("")
+  const dataLoaded = useRef(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -84,8 +85,8 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: numbe
       console.log(result)
       setPost(result)
 
-      // 조회수 증가 (실제 구현에서는 API 호출)
-      setViewCount((prev) => prev + 1)
+      await increasePostViews(id);
+      setViewCount(result.views + 1)
 
       // 로그인 상태 확인
       try {
@@ -98,8 +99,11 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: numbe
         console.error("로그인 상태 확인 실패:", error)
       }
     }
-    loadData()
-  }, [id])
+    if (!dataLoaded.current) {
+      loadData()
+      dataLoaded.current = true;
+    }
+  }, [id, post])
 
   const handleGoBack = () => {
     router.back()
@@ -243,7 +247,7 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: numbe
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Eye className="h-4 w-4" />
-                <span>{viewCount.toLocaleString()}회</span>
+                <span>{viewCount.toLocaleString()}</span>
               </div>
             </div>
 

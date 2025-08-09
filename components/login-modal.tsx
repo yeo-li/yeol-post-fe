@@ -29,6 +29,25 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
     window.location.href = `${process.env.NEXT_PUBLIC_URL}/oauth2/authorization/kakao`
   }
 
+  const handleEmailLogin = async () => {
+    if (!email || !password) {
+      // 이메일 또는 비밀번호가 입력되지 않았을 경우 처리 (예: 알림)
+      alert("이메일과 비밀번호를 모두 입력해주세요.");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await login(email, password);
+      onClose(); // 로그인이 성공하면 모달을 닫습니다.
+    } catch (error) {
+      console.error("Login failed", error);
+      // 로그인 실패 시 사용자에게 에러 메시지를 보여주는 로직을 추가할 수 있습니다.
+      alert("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleClose = () => {
     if (!isLoading) {
       onClose()
@@ -76,6 +95,16 @@ export function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 className="w-full"
                 disabled={isLoading}
               />
+              <Button onClick={handleEmailLogin} disabled={isLoading} className="w-full">
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    로그인 중...
+                  </>
+                ) : (
+                  "로그인"
+                )}
+              </Button>
             </div>
 
             {/* 구분선 */}

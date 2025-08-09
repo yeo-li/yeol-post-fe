@@ -40,7 +40,7 @@ export default function HomePage() {
     }
     const fetchAdminName = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/v1/admins/me", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admins/me`, {
           credentials: "include",
         })
         const data = await res.json()

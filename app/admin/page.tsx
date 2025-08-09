@@ -300,7 +300,7 @@ export default function AdminPage() {
                           className="border-b py-8 hover:bg-muted/30 transition-colors"
                       >
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                          <div className="flex-1">
+                          <div className="flex-1 cursor-pointer" onClick={() => handleViewPost(post.postId)}>
                             <div className="flex items-center gap-2 mb-3 flex-wrap">
                               <Badge
                                   variant={post.is_published ? "default" : "secondary"}

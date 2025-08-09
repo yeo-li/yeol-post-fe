@@ -395,3 +395,23 @@ export async function fetchUpdateCategory(categoryId: number, data: any) {
         throw err;
     }
 }
+
+export async function increasePostViews(postId: number) {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}/views`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            cache: 'no-store', // 캐시 방지
+        });
+
+        if (!response.ok) {
+            throw new Error(`조회수 증가 실패: ${response.status}`);
+        }
+
+        console.log('조회수 증가 성공');
+    } catch (error) {
+        console.error('조회수 증가 중 오류 발생:', error);
+    }
+}
