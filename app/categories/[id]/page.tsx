@@ -245,8 +245,8 @@ export default function DynamicCategoryPage() {
                                                             {categoryName}
                                                         </Badge>
                                                         <span className="flex items-center gap-1 whitespace-nowrap">
-                                                            <Heart className="h-3 w-3 flex-shrink-0" />
-                                                            0
+                                                            {/*<Heart className="h-3 w-3 flex-shrink-0" />*/}
+                                                            {/*0*/}
                                                         </span>
                                                     </div>
 

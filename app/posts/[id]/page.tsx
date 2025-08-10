@@ -69,8 +69,8 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: numbe
   const [userInfo, setUserInfo] = useState<any>(null)
 
   // 상호작용 상태
-  const [isLiked, setIsLiked] = useState(false)
-  const [likeCount, setLikeCount] = useState(42)
+  // const [isLiked, setIsLiked] = useState(false)
+  // const [likeCount, setLikeCount] = useState(0)
   const [viewCount, setViewCount] = useState(0)
   const [comments, setComments] = useState<Comment[]>(mockComments)
   const [newComment, setNewComment] = useState("")
@@ -113,10 +113,10 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: numbe
     router.push(`/admin/write?id=${id}`)
   }
 
-  const handleLike = () => {
-    setIsLiked(!isLiked)
-    setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1))
-  }
+  // const handleLike = () => {
+  //   setIsLiked(!isLiked)
+  //   setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1))
+  // }
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -300,19 +300,19 @@ export default function PostDetailPage({ params }: { params: Promise<{ id: numbe
 
             {/* Engagement Actions */}
             <div className="flex items-center justify-between mb-12">
-              <p className="text-sm text-muted-foreground">이 글이 도움이 되셨나요?</p>
+              {/*<p className="text-sm text-muted-foreground">이 글이 도움이 되셨나요?</p>*/}
               <div className="flex items-center gap-4">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`gap-2 transition-colors ${
-                        isLiked ? "text-red-500 hover:text-red-600" : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    onClick={handleLike}
-                >
-                  <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
-                  좋아요 {likeCount}
-                </Button>
+                {/*<Button*/}
+                {/*    variant="ghost"*/}
+                {/*    size="sm"*/}
+                {/*    className={`gap-2 transition-colors ${*/}
+                {/*        isLiked ? "text-red-500 hover:text-red-600" : "text-muted-foreground hover:text-foreground"*/}
+                {/*    }`}*/}
+                {/*    onClick={handleLike}*/}
+                {/*>*/}
+                {/*  <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />*/}
+                {/*  좋아요 {likeCount}*/}
+                {/*</Button>*/}
                 <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
                   <Share2 className="h-4 w-4" />
                   공유하기

@@ -134,8 +134,7 @@ export default function HomePage() {
                           )}
 
                           <span className="flex items-center gap-1">
-                        <Heart className="h-4 w-4 flex-shrink-0" />
-                        0
+                        {/*<Heart className="h-4 w-4 flex-shrink-0" /> 0*/}
                       </span>
                         </div>
 
